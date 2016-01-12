@@ -13,9 +13,9 @@ namespace PlanetWars.Server
         public Vector Position { get; set; }
 
         /// <summary>
-        /// Owner string as guid
+        /// Owner string as guid, neutral player is zero guid
         /// </summary>
-        public string Owner { get; set; }
+        public string Owner { get; set; } = Guid.Empty.ToString();
 
     }
 }

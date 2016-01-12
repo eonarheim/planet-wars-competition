@@ -30,5 +30,10 @@ namespace PlanetWars.Server
         {
             return new Vector(v1.X - v2.X, v1.Y - v2.Y);
         }
+
+        public double Distance(Vector other)
+        {
+            return Math.Sqrt(Math.Pow(X - other.X, 2) + Math.Pow(Y - other.Y, 2));
+        }
     }
 }
