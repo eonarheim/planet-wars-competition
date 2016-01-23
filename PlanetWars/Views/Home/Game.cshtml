@@ -1,0 +1,15 @@
+﻿@model PlanetWars.Models.GameSession
+@{
+    ViewBag.Title = "Game Session #" + Model.GameId;
+}
+
+<h2>Session #@Model.GameId</h2>
+<h3>Players: @string.Join(", ", Model.Players)</h3>
+
+<canvas id="game"></canvas>
+
+@section scripts {
+    <script type="text/javascript">
+        GameSession.create(@Model.GameId);
+    </script>
+}

@@ -207,6 +207,10 @@
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />
     <Content Include="Scripts\head\modernizr-2.6.2.js" />
+    <Content Include="Scripts\lodash.core.js" />
+    <Content Include="Scripts\lodash.core.min.js" />
+    <Content Include="Scripts\lodash.js" />
+    <Content Include="Scripts\lodash.min.js" />
     <Content Include="Scripts\respond.js" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
@@ -223,9 +227,15 @@
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\Shared\Error.cshtml" />
     <Content Include="Views\Shared\_Layout.cshtml" />
+    <Content Include="Views\Home\Game.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="Scripts\excalibur-0.6.0.d.ts" />
+    <TypeScriptCompile Include="Scripts\game\Assets.ts" />
+    <TypeScriptCompile Include="Scripts\game\Game.ts" />
+    <TypeScriptCompile Include="Scripts\typings\jquery\jquery.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\lodash\lodash-3.10.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\lodash\lodash.d.ts" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />

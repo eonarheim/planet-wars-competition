@@ -21,10 +21,14 @@ namespace PlanetWars.Controllers
                 yield return new GameSession()
                 {
                     GameId = game.Key,
-                    Players = game.Value.Players.Select(x => x.Key).ToArray();
+                    Players = game.Value.Players.Select(x => x.Key).ToArray()
                 };
             }
         }
-        
+
+        public Game Get(int sessionId)
+        {
+            return GameManager.Instance.Games[sessionId];
+        }
     }
 }
