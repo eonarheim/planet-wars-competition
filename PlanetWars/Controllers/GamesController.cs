@@ -23,7 +23,7 @@ namespace PlanetWars.Controllers
         // GET api/games
         public IEnumerable<GameSession> Get()
         {
-            var games = GameManager.Instance.Games;
+            var games = _gameManager.Games;
 
             foreach (var game in games)
             {
@@ -34,12 +34,7 @@ namespace PlanetWars.Controllers
                 };
             }
         }
-
-        public StatusResult Get(int gameId)
-        {
-            return GameManager.Instance.GetStatus(gameId);
-        }
-
+        
         /// <summary>
         /// Initiates an agent logon with the simulation server by name. Once an agent is logged on, 
         /// a logon result is returned with the id and starting time of the next game.

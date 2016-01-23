@@ -16,8 +16,9 @@ class GameSession {
       var game = new ex.Engine({
          canvasElementId: "game",
          height: 480,
-         width: 720
+         width: 720         
       });
+      game.backgroundColor = ex.Color.Black;
 
       // load assets
       var loader = new ex.Loader();      
@@ -78,7 +79,7 @@ class GameSession {
 
    static updateSessionState(): JQueryPromise<Server.StatusResult> {
 
-      return $.getJSON(`/api/games/${GameSession.Id}`).then(s => {
+      return $.post("/api/status", { gameId: this.Id }).then(s => {
          GameSession.State = <Server.StatusResult>s;
       });
 

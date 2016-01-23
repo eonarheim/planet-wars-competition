@@ -4,7 +4,7 @@ module Server {
     
     export interface MoveRequest {
         
-        authonToken: string;
+        authToken: string;
         destinationPlanetId: number;
         gameId: number;
         numberOfShips: number;
