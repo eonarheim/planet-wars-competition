@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 
 namespace PlanetWars.Shared
 {
-    class StatusRequest
+    public class StatusRequest
     {
+        public string AuthToken { get; set; }
+        public int GameId { get; set; }
     }
 }

@@ -158,7 +158,6 @@
     <Compile Include="Areas\HelpPage\SampleGeneration\SampleDirection.cs" />
     <Compile Include="Areas\HelpPage\SampleGeneration\TextSample.cs" />
     <Compile Include="Areas\HelpPage\XmlDocumentationProvider.cs" />
-    <Compile Include="Commands\Logon.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\GamesController.cs" />
     <Compile Include="Global.asax.cs">
@@ -235,6 +234,16 @@
   </ItemGroup>
   <ItemGroup>
     <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CSharpAgent\CSharpAgent.csproj">
+      <Project>{5b3502f0-db70-4052-a871-b44684e5dfd7}</Project>
+      <Name>CSharpAgent</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PlanetWars.Shared\PlanetWars.Shared.csproj">
+      <Project>{dcfff982-65a4-478b-ad3c-f22609bc5fde}</Project>
+      <Name>PlanetWars.Shared</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PlanetWars.Shared;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -31,50 +32,35 @@ namespace PlanetWars.Server
             return game;
         }
 
-        
-        public LogonResult Execute(LogonCommand command)
+        public Game GetWaitingGame()
         {
-            var game = GetNewGame();
-            var demoResult = game.LogonPlayer("DemoAgent");
-            game.StartDemoAgent(demoResult, "DemoAgent");
-            var result = game.LogonPlayer(command.AgentName);
-            game.Start();
-
-            return result;
+            return Games.Values.FirstOrDefault(g => g.Waiting);
         }
 
-        
-        public LogonResult Execute(LogonP1Command command)
+               
+        public LogonResult Execute(LogonRequest request)
         {
-            var game = GetNewGame();
-            game.Waiting = true;
-            game.Start();
-            return game.LogonPlayer(command.AgentName);
-        }
-
-        
-        public LogonResult Execute(LogonP2Command command)
-        {
-            var game = Games[command.GameId];
-            LogonResult result = null;
-            if (game.Waiting)
+            // check for waiting games and log players into that
+            var game = GetWaitingGame();
+            if(game != null)
             {
-                result = game.LogonPlayer(command.AgentName);
                 game.Waiting = false;
+                return game.LogonPlayer(request.AgentName);
             }
-            return result;
+            else
+            {
+                game = GetNewGame();
+                game.Waiting = true;
+                game.Start();
+                return game.LogonPlayer(request.AgentName);
+            }            
         }
-
-        public KillResult Execute(KillCommand command)
+        
+               
+        public StatusResult Execute(StatusRequest request)
         {
-            return new KillResult();
-        }
-
-        [ValidateAuthToken]
-        public StatusResult Execute(StatusCommand command)
-        {
-            var game = Games[command.GameId];
-            var result = game.GetStatus(command);
+            var game = Games[request.GameId];
+            var result = game.GetStatus(request);
             return result;
         }
     }
