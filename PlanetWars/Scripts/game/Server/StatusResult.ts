@@ -11,6 +11,8 @@ module Server {
         currentTurn: number;
         endOfCurrentTurn: Date;
         nextTurnStart: Date;
+        playerTurnLength: number;
+        serverTurnLength: number;
         planets: Planet[];
         fleets: Fleet[];
     }

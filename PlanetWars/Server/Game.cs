@@ -20,10 +20,13 @@ namespace PlanetWars.Server
 
     public class Game : IGame
     {
+
+        // todo planet generation
+
         private static int _MAXID = 0;
         private static readonly long START_DELAY = 5000; // 5 seconds
-        private static readonly long TURN_LENGTH = 200; // 200 ms
-        private static readonly long PROCESSING = 200; // 200 ms
+        private static readonly long PLAYER_TURN_LENGTH = 200; // 200 ms
+        private static readonly long SERVER_TURN_LENGTH = 200; // 200 ms
         private static readonly int MAX_TURN = 200; // default 200 turns
 
         public static bool IsRunningLocally = HttpContext.Current.Request.IsLocal;
@@ -33,14 +36,18 @@ namespace PlanetWars.Server
         public int Turn { get; private set; }
         public bool Waiting { get; internal set; }
         public bool GameOver { get; private set; }
+        public int TIME_TO_WAIT { get; private set; }
 
         private HighFrequencyTimer _gameLoop = null;
         public ConcurrentDictionary<string, Player> Players = new ConcurrentDictionary<string, Player>();
         public ConcurrentDictionary<string, Player> AuthTokens = new ConcurrentDictionary<string, Player>();
 
         private DateTime gameStart = DateTime.UtcNow.AddMilliseconds(START_DELAY);
+        private DateTime endPlayerTurn;
+        private DateTime endServerTurn;
 
         private bool _started;
+        private bool serverComplete;
 
         public Game(int? seed, int? id) : base()
         {
@@ -70,6 +77,8 @@ namespace PlanetWars.Server
             Running = false;
             _started = false;
             _gameLoop = new HighFrequencyTimer(60, this.Update);
+            endPlayerTurn = gameStart.AddMilliseconds(PLAYER_TURN_LENGTH);
+            endServerTurn = endPlayerTurn.AddMilliseconds(SERVER_TURN_LENGTH);
         }
 
         public MoveResult MoveFleet(MoveRequest request)
@@ -139,20 +148,54 @@ namespace PlanetWars.Server
             Running = false;
             _gameLoop.Stop();
         }
+               
 
         public void Update(long delta)
         {
-            // Process ships movement
-
-            // Update ship counts
-
-            // Resolve collisions
-
-            // Update scores            
+            var currentTime = DateTime.UtcNow;
+            if (this.Waiting)
+            {
+               
+                if(currentTime > gameStart)
+                {
+                    GameOver = true;
+                    this.Stop();
+                }
+                return;
+            }
             
-            // Turn complete
-            Turn++;
+            if (GameOver)
+            {
+                this.Stop();
+                return;
+            }
+                        
+            // check if we are in the server window
+            if(currentTime > endPlayerTurn && currentTime < endServerTurn)
+            {
+                // server processing                
 
+                // Process ships movement
+
+                // Update ship counts
+
+                // Resolve collisions
+
+                // Update scores            
+                    
+
+                // Turn complete
+                Turn++;
+                endPlayerTurn = currentTime.AddMilliseconds(PLAYER_TURN_LENGTH);
+                endServerTurn = currentTime.AddMilliseconds(SERVER_TURN_LENGTH);
+
+            }
+            else
+            {
+                return;
+            }
+            
+            
             if(Turn >= MAX_TURN)
             {
                 this.GameOver = true;
