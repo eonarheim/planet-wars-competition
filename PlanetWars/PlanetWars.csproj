@@ -210,7 +210,8 @@
     <Content Include="Scripts\excalibur-0.6.0.js" />
     <Content Include="Scripts\excalibur-0.6.0.js.map" />
     <Content Include="Scripts\game.js.map" />
-    <Content Include="Scripts\game\Models.tst" />
+    <Content Include="Scripts\game\Models\Models.tst" />
+    <Content Include="Scripts\game\Server\Server.tst" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\game.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />
@@ -240,10 +241,56 @@
   <ItemGroup>
     <TypeScriptCompile Include="Scripts\excalibur-0.6.0.d.ts" />
     <TypeScriptCompile Include="Scripts\game\Assets.ts" />
+    <TypeScriptCompile Include="Scripts\game\Config.ts" />
+    <TypeScriptCompile Include="Scripts\game\Planet.ts" />
+    <TypeScriptCompile Include="Scripts\game\Server\BaseResult.ts">
+      <DependentUpon>Server.tst</DependentUpon>
+      <CustomToolNamespace>..\PlanetWars.Shared\BaseResult.cs</CustomToolNamespace>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="Scripts\game\Server\Fleet.ts">
+      <DependentUpon>Server.tst</DependentUpon>
+      <CustomToolNamespace>..\PlanetWars.Shared\Fleet.cs</CustomToolNamespace>
+    </TypeScriptCompile>
     <TypeScriptCompile Include="Scripts\game\Game.ts" />
-    <TypeScriptCompile Include="Scripts\game\GameSession.ts">
+    <TypeScriptCompile Include="Scripts\game\Models\GameSession.ts">
       <DependentUpon>Models.tst</DependentUpon>
       <CustomToolNamespace>Models\GameSession.cs</CustomToolNamespace>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="Scripts\game\Server\LogonRequest.ts">
+      <DependentUpon>Server.tst</DependentUpon>
+      <CustomToolNamespace>..\PlanetWars.Shared\LogonRequest.cs</CustomToolNamespace>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="Scripts\game\Server\LogonResult.ts">
+      <DependentUpon>Server.tst</DependentUpon>
+      <CustomToolNamespace>..\PlanetWars.Shared\LogonResult.cs</CustomToolNamespace>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="Scripts\game\Server\MoveRequest.ts">
+      <DependentUpon>Server.tst</DependentUpon>
+      <CustomToolNamespace>..\PlanetWars.Shared\MoveRequest.cs</CustomToolNamespace>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="Scripts\game\Server\MoveResult.ts">
+      <DependentUpon>Server.tst</DependentUpon>
+      <CustomToolNamespace>..\PlanetWars.Shared\MoveResult.cs</CustomToolNamespace>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="Scripts\game\Server\Planet.ts">
+      <DependentUpon>Server.tst</DependentUpon>
+      <CustomToolNamespace>..\PlanetWars.Shared\Planet.cs</CustomToolNamespace>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="Scripts\game\Server\Player.ts">
+      <DependentUpon>Server.tst</DependentUpon>
+      <CustomToolNamespace>..\PlanetWars.Shared\Player.cs</CustomToolNamespace>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="Scripts\game\Server\Point.ts">
+      <DependentUpon>Server.tst</DependentUpon>
+      <CustomToolNamespace>..\PlanetWars.Shared\Point.cs</CustomToolNamespace>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="Scripts\game\Server\StatusRequest.ts">
+      <DependentUpon>Server.tst</DependentUpon>
+      <CustomToolNamespace>..\PlanetWars.Shared\StatusRequest.cs</CustomToolNamespace>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="Scripts\game\Server\StatusResult.ts">
+      <DependentUpon>Server.tst</DependentUpon>
+      <CustomToolNamespace>..\PlanetWars.Shared\StatusResult.cs</CustomToolNamespace>
     </TypeScriptCompile>
     <TypeScriptCompile Include="Scripts\typings\jquery\jquery.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\lodash\lodash.d.ts" />

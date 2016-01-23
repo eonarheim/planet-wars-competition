@@ -6,10 +6,10 @@
 		settings.IncludeReferencedProjects();
 	}
 }
-module Models {
 
-    $Classes(PlanetWars.Models.*)[
-    export interface I$Name {
+module Server {
+    $Classes(PlanetWars.Shared.*)[
+    export interface $Name$TypeParameters {
         $Properties[
         $name: $Type;]
     }]

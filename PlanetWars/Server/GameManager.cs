@@ -37,6 +37,16 @@ namespace PlanetWars.Server
             return Games.Values.FirstOrDefault(g => g.Waiting);
         }
 
+        public BaseResult<StatusResult> GetGameStatus(int gameId)
+        {
+            if (!Games.ContainsKey(gameId)) {
+                return StatusResult.Fail("Game doesn't exist");
+            }
+            var game = Games[gameId];            
+            var result = game.GetStatus(null);
+            return result;
+        }
+
         public List<string> GetAllAuthTokens()
         {
             return Games.Values.SelectMany(g => g.AuthTokens.Keys).ToList();
@@ -64,8 +74,7 @@ namespace PlanetWars.Server
                 return game.LogonPlayer(request.AgentName);
             }            
         }
-        
-               
+                       
         public StatusResult Execute(StatusRequest request)
         {
             var game = Games[request.GameId];
