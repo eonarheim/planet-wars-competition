@@ -4,17 +4,26 @@
     <div class="alert alert-info">For any issues or questions please use the <a href="https://github.com/eonarheim/planet-wars-competition"><strong>issue tracker</strong></a>, or contact Erik Onarheim or Kamran Ayub</div>
     <div class="col-xs-12">
 
-        <div id="no-games" class="alert alert-warning">No games yet, plz make some...</div>
-        <ul id="games"></ul>
+        <div id="no-games" class="alert alert-warning">Waiting for games...</div>
 
-
+        <ul id="games"></ul>        
     </div>
 </div>
 @section scripts {
 
     <script type="text/javascript">
 
-       // todo script
+        setInterval(function() {
+
+            $.getJSON("/api/games").then(function (games) {
+                if (!games || !games.length) return;
+
+                $.each(games, function(game) {
+                    $("#games").append("<li><a href='/games/" + game.id + "'>#" + game.id + " (" + game.players.join(",") +")</a></li>");
+                });
+            });
+
+        }, 2000);
 
     </script>
 }
