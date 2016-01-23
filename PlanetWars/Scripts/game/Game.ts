@@ -30,18 +30,15 @@ class GameSession {
    }
 
    // Game Objects
-   private static _planets: {[key: number]: Planet} = [];
+   private static _planets: { [key: number]: Planet } = [];
+   private static _fleets: { [key: number]: Fleet } = [];
+   private static _turnTimer: ex.Timer;
 
    static init() {
 
       this.updateSessionState().then(() => {
-         
-         // add planets to game
-         _.each(GameSession.State.planets, (p) => {
-            var planet = new Planet(p);
-            this._planets[p.id] = planet;
-            this.Game.add(planet);
-         });
+
+         this._turnTimer = new ex.Timer(() => this.updateSessionState(), this.getTurnDuration(), true);
 
       });
 
@@ -81,7 +78,42 @@ class GameSession {
 
       return $.post("/api/status", { gameId: this.Id }).then(s => {
          GameSession.State = <Server.StatusResult>s;
+
+         // add planets to game
+         _.each(GameSession.State.planets, (p) => {
+            var planet = new Planet(p);
+
+            if (!this._planets[p.id]) {
+               this.Game.add(planet);
+            }
+            this._planets[p.id] = planet;
+         });
+
+         // add fleets
+         _.each(GameSession.State.fleets, (f) => {
+            var fleet = new Fleet(f);
+            if (!this._fleets[f.id]) {
+               this.Game.add(fleet);
+            }
+            this._fleets[f.id] = fleet;            
+         });
       });
 
+   }
+
+   static getPlanet(planetId: number) {
+      if (!this._planets[planetId]) {
+         throw "Planet does not exist";
+      }
+
+      return this._planets[planetId];
+   }
+
+   static getOwnerColor(ownerId: number) {
+      return this.State.playerA === ownerId ? Config.PlayerAColor : Config.PlayerBColor;
+   }
+
+   static getTurnDuration() {
+      return this.State.playerTurnDuration + this.State.serverTurnDuration;
    }
 }
