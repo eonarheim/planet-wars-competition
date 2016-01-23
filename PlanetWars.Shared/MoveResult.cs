@@ -8,5 +8,6 @@ namespace PlanetWars.Shared
 {
     public class MoveResult : BaseResult
     {
+        public Fleet Fleet { get; set; }
     }
 }

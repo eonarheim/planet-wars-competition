@@ -10,5 +10,8 @@ namespace PlanetWars.Shared
     {
         public bool IsGameOver { get; set; }
         public bool Status { get; set; }
+
+        public List<Planet> Planets { get; set;}
+        public List<Fleet> Fleets { get; set; }
     }
 }

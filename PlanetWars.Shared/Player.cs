@@ -4,14 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PlanetWars.Server
+namespace PlanetWars.Shared
 {
     public class Player
     {
-        public string AuthToken { get; set; }
-        public string PlayerName { get; set; }
-        // this is the public Id not used for authentication and can be shared
+        // this is the public ID not used for authentication
         public int Id { get; set; }
+        public string Name { get; set; }
         public int Score { get; set; }
     }
 }

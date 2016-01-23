@@ -172,7 +172,6 @@
     <Compile Include="Server\HighFrequencyTimer.cs" />
     <Compile Include="Server\Planet.cs" />
     <Compile Include="Server\Player.cs" />
-    <Compile Include="Server\Vector.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Areas\HelpPage\HelpPage.css" />

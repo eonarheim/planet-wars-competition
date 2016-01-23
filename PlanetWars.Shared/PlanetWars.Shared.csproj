@@ -41,10 +41,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BaseResult.cs" />
+    <Compile Include="Fleet.cs" />
     <Compile Include="LogonRequest.cs" />
     <Compile Include="LogonResult.cs" />
     <Compile Include="MoveRequest.cs" />
     <Compile Include="MoveResult.cs" />
+    <Compile Include="Planet.cs" />
+    <Compile Include="Player.cs" />
+    <Compile Include="Point.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StatusRequest.cs" />
     <Compile Include="StatusResult.cs" />
