@@ -160,10 +160,11 @@
     <Compile Include="Areas\HelpPage\XmlDocumentationProvider.cs" />
     <Compile Include="Commands\Logon.cs" />
     <Compile Include="Controllers\HomeController.cs" />
-    <Compile Include="Controllers\ValuesController.cs" />
+    <Compile Include="Controllers\GamesController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Models\GameSession.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Server\ClientManager.cs" />
     <Compile Include="Server\Fleet.cs" />
