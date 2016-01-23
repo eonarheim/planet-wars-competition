@@ -7,9 +7,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlanetWars", "PlanetWars\Pl
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlanetWars.Tests", "PlanetWars.Tests\PlanetWars.Tests.csproj", "{3900299C-FE32-45B9-A684-248CA7C40302}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Design Doc", "Design Doc", "{16AA6E03-5C59-4F8D-B5E2-1E49BDDF75E6}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{16AA6E03-5C59-4F8D-B5E2-1E49BDDF75E6}"
 	ProjectSection(SolutionItems) = preProject
-		design.md = design.md
+		.gitignore = .gitignore
+		LICENSE = LICENSE
+		readme.md = readme.md
 	EndProjectSection
 EndProject
 Global
