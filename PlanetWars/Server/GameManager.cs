@@ -37,10 +37,10 @@ namespace PlanetWars.Server
             return Games.Values.FirstOrDefault(g => g.Waiting);
         }
 
-        public BaseResult<StatusResult> GetGameStatus(int gameId)
+        public StatusResult GetGameStatus(int gameId)
         {
             if (!Games.ContainsKey(gameId)) {
-                return StatusResult.Fail("Game doesn't exist");
+                return null;
             }
             var game = Games[gameId];            
             var result = game.GetStatus(null);
