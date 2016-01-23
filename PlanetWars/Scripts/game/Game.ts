@@ -91,7 +91,7 @@ class GameSession {
 
          // add fleets
          _.each(GameSession.State.fleets, (f) => {
-            var fleet = new Fleet(f);
+            var fleet = Fleet.create(f);
             if (!this._fleets[f.id]) {
                this.Game.add(fleet);
             }
