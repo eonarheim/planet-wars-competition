@@ -17,6 +17,9 @@ namespace PlanetWars.Shared
         public DateTime EndOfCurrentTurn { get; set; }
         public DateTime NextTurnStart { get; set; }
 
+        public int PlayerTurnLength {get; set;}
+        public int ServerTurnLength { get; set;}
+
         public List<Planet> Planets { get; set;}
         public List<Fleet> Fleets { get; set; }
     }
