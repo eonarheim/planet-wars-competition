@@ -59,6 +59,12 @@
     <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\PlanetWars.Shared\PlanetWars.Shared.csproj">
+      <Project>{dcfff982-65a4-478b-ad3c-f22609bc5fde}</Project>
+      <Name>PlanetWars.Shared</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

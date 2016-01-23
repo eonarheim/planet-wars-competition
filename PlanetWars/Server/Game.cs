@@ -1,4 +1,5 @@
-﻿using PlanetWars.Commands;
+﻿using CSharpAgent;
+using PlanetWars.Shared;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -30,12 +31,14 @@ namespace PlanetWars.Server
         public int Id { get; private set; }
         public Random Random { get; set; }
         public int Turn { get; private set; }
+        public bool Waiting { get; internal set; }
 
         private HighFrequencyTimer _gameLoop = null;
         public ConcurrentDictionary<string, Player> Players = new ConcurrentDictionary<string, Player>();
         private ConcurrentDictionary<string, Player> _authTokens = new ConcurrentDictionary<string, Player>();
 
-        private long gameStartCountdown = START_DELAY;
+        private DateTime gameStart = DateTime.UtcNow.AddMilliseconds(START_DELAY);
+
         private bool _started;
 
         public Game(int? seed, int? id) : base()
@@ -49,6 +52,11 @@ namespace PlanetWars.Server
             {
                 Id = id.Value;
             }
+        }
+
+        internal StatusResult GetStatus(StatusRequest request)
+        {
+            throw new NotImplementedException();
         }
 
         public Game()
@@ -89,7 +97,7 @@ namespace PlanetWars.Server
                 
                 result.AuthToken = newPlayer.AuthToken;
                 result.GameId = Id;
-                result.GameStart = (int)this.gameStartCountdown;
+                result.GameStart = this.gameStart;
             }
             else
             {
@@ -113,7 +121,7 @@ namespace PlanetWars.Server
                     endpoint = "http://elevators.azurewebsites.net";
                 }
                 AgentBase sweetDemoAgent = new AgentBase(playerName, endpoint);
-                sweetDemoAgent.Start(demoResult).Wait();
+                sweetDemoAgent.Start().Wait();
             });
         }
 

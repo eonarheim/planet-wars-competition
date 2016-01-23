@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PlanetWars.Shared;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
@@ -13,7 +14,7 @@ namespace CSharpAgent
         private bool _isRunning = false;
         private readonly HttpClient _client = null;
 
-        private List<MoveCommand> _pendingMoveRequest = new List<MoveCommand>();
+        private List<MoveRequest> _pendingMoveRequests = new List<MoveRequest>();
 
         protected long TimeToNextTurn { get; set; }
         protected int GameId { get; set; }
@@ -33,39 +34,30 @@ namespace CSharpAgent
 
         protected async Task<LogonResult> Logon()
         {
-            var response = await _client.PostAsJsonAsync("api/game/logon", new LogonCommand()
+            var response = await _client.PostAsJsonAsync("api/game/logon", new LogonRequest()
             {
                 AgentName = Name
             });
             var result = await response.Content.ReadAsAsync<LogonResult>();
             AuthToken = result.AuthToken;
             GameId = result.GameId;
-            Console.WriteLine("Your game Id is " + result.GameId);
+            Console.WriteLine($"Your game Id is {result.GameId} and starts at {result.GameStart.ToLocalTime().ToShortTimeString()}");
             return result;
         }
 
         protected async Task<StatusResult> UpdateGameState()
         {
-            var response = await _client.PostAsJsonAsync("api/game/status", new StatusCommand()
+            var response = await _client.PostAsJsonAsync("api/game/status", new StatusRequest()
             {
                 AuthToken = AuthToken,
                 GameId = GameId
             });
             var result = await response.Content.ReadAsAsync<StatusResult>();
-            TimeToNextTurn = result.TimeUntilNextTurn;
-            Console.WriteLine(string.Format("\nTURN: {0} \t DELIVERED: {1} \t ENEMY DELIVERED {2}", result.Turn, result.Delivered, result.EnemyDelivered));
-            foreach (Elevator e in result.EnemyElevators)
-            {
-                Console.WriteLine(string.Format("Enemy Elevator {0} is on floor {1} with {2} Meeples", e.Id, e.Floor, e.Meeples.Count));
-            }
-            foreach (Elevator e in result.MyElevators)
-            {
-                Console.WriteLine(string.Format("My Elevator {0} is on floor {1} with {2} Meeples", e.Id, e.Floor, e.Meeples.Count));
-            }
+            
             return result;
         }
 
-        protected async Task<List<MoveResult>> SendUpdate(List<MoveCommand> moveCommands)
+        protected async Task<List<MoveResult>> SendUpdate(List<MoveRequest> moveCommands)
         {
             var results = new List<MoveResult>();
             foreach (var moveCommand in moveCommands)
@@ -93,7 +85,7 @@ namespace CSharpAgent
                     if (gs.IsGameOver)
                     {
                         _isRunning = false;
-                        Console.WriteLine("Game Over!");
+                        Console.WriteLine(" Game Over!");
                         Console.WriteLine(gs.Status);
                         _client.Dispose();
                         break;
@@ -108,6 +100,16 @@ namespace CSharpAgent
                     }
                 }
             }
+        }
+
+        private Task SendUpdate(object _pendingMoveRequests)
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual void Update(StatusResult gs)
+        {
+            throw new NotImplementedException();
         }
     }
 }

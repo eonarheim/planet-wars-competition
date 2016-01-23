@@ -8,6 +8,7 @@ namespace PlanetWars.Shared
 {
     public class StatusResult : BaseResult
     {
-
+        public bool IsGameOver { get; set; }
+        public bool Status { get; set; }
     }
 }
