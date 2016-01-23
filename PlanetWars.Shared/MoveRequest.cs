@@ -10,7 +10,7 @@ namespace PlanetWars.Shared
     {
         public MoveRequest(string authToken, int gameId, int sourcePlanetId, int destinationPlanetId, int numberOfShips)
         {
-            this.AuthonToken = authToken;
+            this.AuthToken = authToken;
             this.GameId = gameId;
             this.SourcePlanetId = sourcePlanetId;
             this.DestinationPlanetId = destinationPlanetId;
@@ -18,7 +18,7 @@ namespace PlanetWars.Shared
 
         }
 
-        public string AuthonToken { get; private set; }
+        public string AuthToken { get; private set; }
         public int DestinationPlanetId { get; private set; }
         public int GameId { get; private set; }
         public int NumberOfShips { get; private set; }

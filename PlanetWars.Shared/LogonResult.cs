@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace PlanetWars.Shared
 {
-    public class LogonResult : BaseResult
+    public class LogonResult : BaseResult<LogonResult>
     {
         public string AuthToken { get; set; }
         public int GameId { get; set; }

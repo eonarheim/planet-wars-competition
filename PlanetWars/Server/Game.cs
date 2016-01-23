@@ -32,10 +32,11 @@ namespace PlanetWars.Server
         public Random Random { get; set; }
         public int Turn { get; private set; }
         public bool Waiting { get; internal set; }
+        public bool GameOver { get; private set; }
 
         private HighFrequencyTimer _gameLoop = null;
         public ConcurrentDictionary<string, Player> Players = new ConcurrentDictionary<string, Player>();
-        private ConcurrentDictionary<string, Player> _authTokens = new ConcurrentDictionary<string, Player>();
+        public ConcurrentDictionary<string, Player> AuthTokens = new ConcurrentDictionary<string, Player>();
 
         private DateTime gameStart = DateTime.UtcNow.AddMilliseconds(START_DELAY);
 
@@ -54,10 +55,7 @@ namespace PlanetWars.Server
             }
         }
 
-        internal StatusResult GetStatus(StatusRequest request)
-        {
-            throw new NotImplementedException();
-        }
+        
 
         public Game()
         {
@@ -74,6 +72,11 @@ namespace PlanetWars.Server
             _gameLoop = new HighFrequencyTimer(60, this.Update);
         }
 
+        public MoveResult MoveFleet(MoveRequest request)
+        {
+            throw new NotImplementedException();
+        }
+
         public LogonResult LogonPlayer(string playerName)
         {
             var result = new LogonResult();
@@ -86,7 +89,7 @@ namespace PlanetWars.Server
                 };
 
                 var success = Players.TryAdd(playerName, newPlayer);
-                var success2 = _authTokens.TryAdd(newPlayer.AuthToken, newPlayer);
+                var success2 = AuthTokens.TryAdd(newPlayer.AuthToken, newPlayer);
 
                 if (success && success2)
                 {
@@ -118,7 +121,7 @@ namespace PlanetWars.Server
                     endpoint = "http://localhost:3193";
                 }
                 else {
-                    endpoint = "http://elevators.azurewebsites.net";
+                    endpoint = "http://planetwars.azurewebsites.net";
                 }
                 AgentBase sweetDemoAgent = new AgentBase(playerName, endpoint);
                 sweetDemoAgent.Start().Wait();
@@ -139,7 +142,38 @@ namespace PlanetWars.Server
 
         public void Update(long delta)
         {
-            throw new NotImplementedException();
+            // Process ships movement
+
+            // Update ship counts
+
+            // Resolve collisions
+
+            // Update scores            
+            
+            // Turn complete
+            Turn++;
+
+            if(Turn >= MAX_TURN)
+            {
+                this.GameOver = true;
+            }
+
+        }
+
+        public StatusResult GetStatus(StatusRequest request)
+        {
+            return new StatusResult()
+            {
+
+                
+                IsGameOver = this.GameOver,
+                CurrentTurn = Turn,
+                
+                //PlayerA = Players.Values;
+                
+
+               
+            };
         }
     }
 }

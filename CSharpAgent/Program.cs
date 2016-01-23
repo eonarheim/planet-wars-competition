@@ -11,7 +11,9 @@ namespace CSharpAgent
         static void Main(string[] args)
         {
             var endpointIndex = args.ToList().Select(a => a.ToLower()).ToList().IndexOf("-endpoint");
-            var endpoint = args[endpointIndex + 1];
+            
+
+            var endpoint = args.Length > endpointIndex + 1 ? args[endpointIndex + 1] : "http://localhost:52802/";
             try
             {
                 var agent = new Agent("DemoAgent", endpoint);

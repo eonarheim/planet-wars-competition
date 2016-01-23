@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace PlanetWars.Shared
 {
-    public class MoveResult : BaseResult
+    public class MoveResult : BaseResult<MoveResult>
     {
         public Fleet Fleet { get; set; }
     }

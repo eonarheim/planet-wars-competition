@@ -37,7 +37,26 @@ namespace PlanetWars.Server
             return Games.Values.FirstOrDefault(g => g.Waiting);
         }
 
-               
+        public BaseResult<StatusResult> GetGameStatus(int gameId)
+        {
+            if (!Games.ContainsKey(gameId)) {
+                return StatusResult.Fail("Game doesn't exist");
+            }
+            var game = Games[gameId];            
+            var result = game.GetStatus(null);
+            return result;
+        }
+
+        public List<string> GetAllAuthTokens()
+        {
+            return Games.Values.SelectMany(g => g.AuthTokens.Keys).ToList();
+        }
+
+        public List<Game> GetAllActiveGames()
+        {
+            return Games.Values.Where(g => g.Running == true).ToList();
+        }
+                       
         public LogonResult Execute(LogonRequest request)
         {
             // check for waiting games and log players into that
@@ -55,12 +74,18 @@ namespace PlanetWars.Server
                 return game.LogonPlayer(request.AgentName);
             }            
         }
-        
-               
+                       
         public StatusResult Execute(StatusRequest request)
         {
             var game = Games[request.GameId];
             var result = game.GetStatus(request);
+            return result;
+        }
+
+        public MoveResult Execute(MoveRequest request)
+        {
+            var game = Games[request.GameId];
+            var result = game.MoveFleet(request);
             return result;
         }
     }
