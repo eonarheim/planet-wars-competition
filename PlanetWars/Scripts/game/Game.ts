@@ -7,11 +7,11 @@
 class GameSession {
    
    static Game: ex.Engine;
-   static SessionId: number;
-   static SessionState: Server.StatusResult;
+   static Id: number;
+   static State: Server.StatusResult;
 
-   static create(sessionId: number) {
-      GameSession.SessionId = sessionId;
+   static create(gameId: number) {
+      GameSession.Id = gameId;
 
       var game = new ex.Engine({
          canvasElementId: "game",
@@ -36,7 +36,7 @@ class GameSession {
       this.updateSessionState().then(() => {
          
          // add planets to game
-         _.each(this.SessionState.planets, (p) => {
+         _.each(GameSession.State.planets, (p) => {
             var planet = new Planet(p);
             this._planets[p.id] = planet;
             this.Game.add(planet);
@@ -52,8 +52,8 @@ class GameSession {
 
    static mapServerCoordsToWorld(p: Server.Point): ex.Point {
       // all planet pos
-      var px = _.map(this.SessionState.planets, k => k.position.x);
-      var py = _.map(this.SessionState.planets, k => k.position.y);
+      var px = _.map(GameSession.State.planets, k => k.position.x);
+      var py = _.map(GameSession.State.planets, k => k.position.y);
 
       // min/max ranges of planet pos
       var pxMin = _.min(px);
@@ -76,10 +76,10 @@ class GameSession {
       return new ex.Point(x, y);
    }
 
-   static updateSessionState(): JQueryPromise<Models.IGameSession> {
+   static updateSessionState(): JQueryPromise<Server.StatusResult> {
 
-      return $.getJSON(`/api/games/${GameSession.SessionId}`).then(sess => {
-         GameSession.SessionState = sess;
+      return $.getJSON(`/api/games/${GameSession.Id}`).then(s => {
+         GameSession.State = <Server.StatusResult>s;
       });
 
    }

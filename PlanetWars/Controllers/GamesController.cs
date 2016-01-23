@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Web.Http;
 using PlanetWars.Models;
 using PlanetWars.Server;
+using PlanetWars.Shared;
 
 namespace PlanetWars.Controllers
 {
@@ -26,9 +27,9 @@ namespace PlanetWars.Controllers
             }
         }
 
-        public Game Get(int sessionId)
+        public StatusResult Get(int gameId)
         {
-            return GameManager.Instance.Games[sessionId];
+            return GameManager.Instance.GetStatus(gameId);
         }
     }
 }
