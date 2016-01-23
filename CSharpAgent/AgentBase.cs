@@ -41,7 +41,7 @@ namespace CSharpAgent
             var result = await response.Content.ReadAsAsync<LogonResult>();
             AuthToken = result.AuthToken;
             GameId = result.GameId;
-            Console.WriteLine("Your game Id is " + result.GameId);
+            Console.WriteLine($"Your game Id is {result.GameId} and starts at {result.GameStart.ToLocalTime().ToShortTimeString()}");
             return result;
         }
 
@@ -85,7 +85,7 @@ namespace CSharpAgent
                     if (gs.IsGameOver)
                     {
                         _isRunning = false;
-                        Console.WriteLine("Game Over!");
+                        Console.WriteLine(" Game Over!");
                         Console.WriteLine(gs.Status);
                         _client.Dispose();
                         break;
@@ -107,7 +107,7 @@ namespace CSharpAgent
             throw new NotImplementedException();
         }
 
-        private void Update(StatusResult gs)
+        public virtual void Update(StatusResult gs)
         {
             throw new NotImplementedException();
         }

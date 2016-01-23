@@ -1,5 +1,4 @@
 ﻿using CSharpAgent;
-using PlanetWars.Commands;
 using PlanetWars.Shared;
 using System;
 using System.Collections.Concurrent;
@@ -38,7 +37,8 @@ namespace PlanetWars.Server
         public ConcurrentDictionary<string, Player> Players = new ConcurrentDictionary<string, Player>();
         private ConcurrentDictionary<string, Player> _authTokens = new ConcurrentDictionary<string, Player>();
 
-        private long gameStartCountdown = START_DELAY;
+        private DateTime gameStart = DateTime.UtcNow.AddMilliseconds(START_DELAY);
+
         private bool _started;
 
         public Game(int? seed, int? id) : base()
@@ -97,7 +97,7 @@ namespace PlanetWars.Server
                 
                 result.AuthToken = newPlayer.AuthToken;
                 result.GameId = Id;
-                result.GameStart = (int)this.gameStartCountdown;
+                result.GameStart = this.gameStart;
             }
             else
             {
