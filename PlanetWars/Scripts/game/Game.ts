@@ -7,17 +7,18 @@
 class GameSession {
    
    static Game: ex.Engine;
-   static SessionId: number;
-   static SessionState: Server.StatusResult;
+   static Id: number;
+   static State: Server.StatusResult;
 
-   static create(sessionId: number) {
-      GameSession.SessionId = sessionId;
+   static create(gameId: number) {
+      GameSession.Id = gameId;
 
       var game = new ex.Engine({
          canvasElementId: "game",
          height: 480,
-         width: 720
+         width: 720         
       });
+      game.backgroundColor = ex.Color.Black;
 
       // load assets
       var loader = new ex.Loader();      
@@ -29,18 +30,15 @@ class GameSession {
    }
 
    // Game Objects
-   private static _planets: {[key: number]: Planet} = [];
+   private static _planets: { [key: number]: Planet } = [];
+   private static _fleets: { [key: number]: Fleet } = [];
+   private static _turnTimer: ex.Timer;
 
    static init() {
 
       this.updateSessionState().then(() => {
-         
-         // add planets to game
-         _.each(this.SessionState.planets, (p) => {
-            var planet = new Planet(p);
-            this._planets[p.id] = planet;
-            this.Game.add(planet);
-         });
+
+         this._turnTimer = new ex.Timer(() => this.updateSessionState(), this.getTurnDuration(), true);
 
       });
 
@@ -52,8 +50,8 @@ class GameSession {
 
    static mapServerCoordsToWorld(p: Server.Point): ex.Point {
       // all planet pos
-      var px = _.map(this.SessionState.planets, k => k.position.x);
-      var py = _.map(this.SessionState.planets, k => k.position.y);
+      var px = _.map(GameSession.State.planets, k => k.position.x);
+      var py = _.map(GameSession.State.planets, k => k.position.y);
 
       // min/max ranges of planet pos
       var pxMin = _.min(px);
@@ -76,11 +74,46 @@ class GameSession {
       return new ex.Point(x, y);
    }
 
-   static updateSessionState(): JQueryPromise<Models.IGameSession> {
+   static updateSessionState(): JQueryPromise<Server.StatusResult> {
 
-      return $.getJSON(`/api/games/${GameSession.SessionId}`).then(sess => {
-         GameSession.SessionState = sess;
+      return $.post("/api/status", { gameId: this.Id }).then(s => {
+         GameSession.State = <Server.StatusResult>s;
+
+         // add planets to game
+         _.each(GameSession.State.planets, (p) => {
+            var planet = new Planet(p);
+
+            if (!this._planets[p.id]) {
+               this.Game.add(planet);
+            }
+            this._planets[p.id] = planet;
+         });
+
+         // add fleets
+         _.each(GameSession.State.fleets, (f) => {
+            var fleet = Fleet.create(f);
+            if (!this._fleets[f.id]) {
+               this.Game.add(fleet);
+            }
+            this._fleets[f.id] = fleet;            
+         });
       });
 
+   }
+
+   static getPlanet(planetId: number) {
+      if (!this._planets[planetId]) {
+         throw "Planet does not exist";
+      }
+
+      return this._planets[planetId];
+   }
+
+   static getOwnerColor(ownerId: number) {
+      return this.State.playerA === ownerId ? Config.PlayerAColor : Config.PlayerBColor;
+   }
+
+   static getTurnDuration() {
+      return this.State.playerTurnLength + this.State.serverTurnLength;
    }
 }

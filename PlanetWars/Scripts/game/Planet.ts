@@ -35,9 +35,9 @@
 
       this._shipLabel.text = `Ships: ${this._planet.numberOfShips.toString()}`;
 
-      if (this._planet.ownerId === GameSession.SessionState.playerA) {
+      if (this._planet.ownerId === GameSession.State.playerA) {
          this._planetColor = Config.PlayerAColor;
-      } else if (this._planet.ownerId === GameSession.SessionState.playerB) {
+      } else if (this._planet.ownerId === GameSession.State.playerB) {
          this._planetColor = Config.PlayerBColor;
       } else {
          this._planetColor = Config.PlanetNeutralColor;
