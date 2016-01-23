@@ -27,15 +27,31 @@ class GameSession {
       GameSession.Game = game;
    }
 
-   static init() {
-      
+   // Game Objects
+   private static _planets: {[key: number]: Planet} = [];
 
+   static init() {
+
+      this.updateSessionState().then(() => {
+         
+         // add planets to game
+         _.each(this.SessionState.planets, (p) => {
+            var planet = new Planet(p);
+            this._planets[p.id] = planet;
+            this.Game.add(planet);
+         });
+
+      });
 
    }
 
-   static updateSessionState() {
+   static mapServerCoordsToWorld(...coord: number[]): number[] {
+      return _.map(coord, c => c * 10);
+   }
 
-      $.getJSON(`/api/games/${GameSession.SessionId}`).then(sess => {
+   static updateSessionState(): JQueryPromise<Models.IGameSession> {
+
+      return $.getJSON(`/api/games/${GameSession.SessionId}`).then(sess => {
          GameSession.SessionState = sess;
       });
 

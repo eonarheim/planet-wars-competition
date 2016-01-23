@@ -239,6 +239,7 @@
       <DependentUpon>Models.tst</DependentUpon>
       <CustomToolNamespace>Models\GameSession.cs</CustomToolNamespace>
     </TypeScriptCompile>
+    <TypeScriptCompile Include="Scripts\game\Planet.ts" />
     <TypeScriptCompile Include="Scripts\typings\jquery\jquery.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\lodash\lodash.d.ts" />
   </ItemGroup>
