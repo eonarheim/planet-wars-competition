@@ -1,10 +1,13 @@
 ﻿/// <reference path="../excalibur-0.6.0.d.ts"/>
+/// <reference path="../typings/lodash/lodash.d.ts"/>
+/// <reference path="Assets.ts"/>
+/// <reference path="GameSession.ts"/>
 
 class GameSession {
    
    static Game: ex.Engine;
    static SessionId: number;
-   static SessionState: any;
+   static SessionState: Models.IGameSession;
 
    static create(sessionId: number) {
       GameSession.SessionId = sessionId;
