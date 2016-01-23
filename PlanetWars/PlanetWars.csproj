@@ -204,6 +204,7 @@
     <Content Include="Scripts\excalibur-0.6.0.js" />
     <Content Include="Scripts\excalibur-0.6.0.js.map" />
     <Content Include="Scripts\game.js.map" />
+    <Content Include="Scripts\game\Models.tst" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\game.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />
@@ -234,6 +235,10 @@
     <TypeScriptCompile Include="Scripts\excalibur-0.6.0.d.ts" />
     <TypeScriptCompile Include="Scripts\game\Assets.ts" />
     <TypeScriptCompile Include="Scripts\game\Game.ts" />
+    <TypeScriptCompile Include="Scripts\game\GameSession.ts">
+      <DependentUpon>Models.tst</DependentUpon>
+      <CustomToolNamespace>Models\GameSession.cs</CustomToolNamespace>
+    </TypeScriptCompile>
     <TypeScriptCompile Include="Scripts\typings\jquery\jquery.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\lodash\lodash.d.ts" />
   </ItemGroup>
