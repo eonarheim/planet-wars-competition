@@ -122,7 +122,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Server\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\BundleConfig.cs" />
@@ -163,6 +162,14 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Server\ClientManager.cs" />
+    <Compile Include="Server\Fleet.cs" />
+    <Compile Include="Server\Game.cs" />
+    <Compile Include="Server\GameManager.cs" />
+    <Compile Include="Server\HighFrequencyTimer.cs" />
+    <Compile Include="Server\Planet.cs" />
+    <Compile Include="Server\Player.cs" />
+    <Compile Include="Server\Vector.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Areas\HelpPage\HelpPage.css" />
