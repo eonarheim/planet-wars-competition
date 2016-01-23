@@ -34,26 +34,25 @@ namespace CSharpAgent
 
         protected async Task<LogonResult> Logon()
         {
-            var response = await _client.PostAsJsonAsync("api/game/logon", new LogonRequest()
+            var response = await _client.PostAsJsonAsync("api/logon", new LogonRequest()
             {
                 AgentName = Name
             });
             var result = await response.Content.ReadAsAsync<LogonResult>();
             AuthToken = result.AuthToken;
             GameId = result.GameId;
-            Console.WriteLine($"Your game Id is {result.GameId} and starts at {result.GameStart.ToLocalTime().ToShortTimeString()}");
+            Console.WriteLine($"Your game Id is {result.GameId} auth {result.AuthToken} and starts at {result.GameStart.ToLocalTime().ToLongTimeString()}");
             return result;
         }
 
         protected async Task<StatusResult> UpdateGameState()
         {
-            var response = await _client.PostAsJsonAsync("api/game/status", new StatusRequest()
+            var response = await _client.PostAsJsonAsync("api/status", new StatusRequest()
             {
-                AuthToken = AuthToken,
                 GameId = GameId
             });
             var result = await response.Content.ReadAsAsync<StatusResult>();
-            
+            TimeToNextTurn = result.NextTurnStart.Subtract(DateTime.UtcNow).Milliseconds;
             return result;
         }
 
@@ -62,8 +61,10 @@ namespace CSharpAgent
             var results = new List<MoveResult>();
             foreach (var moveCommand in moveCommands)
             {
+                // todo use await task.whenAll
+                // ContinueWith(results into a list)
                 // Console.WriteLine(string.Format("posting move {0} for elevator {1}", moveCommand.Direction, moveCommand.ElevatorId));
-                var response = await _client.PostAsJsonAsync("api/game/move", moveCommand);
+                var response = await _client.PostAsJsonAsync("api/move", moveCommand);
                 var result = await response.Content.ReadAsAsync<MoveResult>();
                 Console.WriteLine(result.Message);
                 results.Add(result);
@@ -85,7 +86,7 @@ namespace CSharpAgent
                     if (gs.IsGameOver)
                     {
                         _isRunning = false;
-                        Console.WriteLine(" Game Over!");
+                        Console.WriteLine("Game Over!");
                         Console.WriteLine(gs.Status);
                         _client.Dispose();
                         break;
@@ -101,15 +102,10 @@ namespace CSharpAgent
                 }
             }
         }
-
-        private Task SendUpdate(object _pendingMoveRequests)
-        {
-            throw new NotImplementedException();
-        }
-
+        
         public virtual void Update(StatusResult gs)
         {
-            throw new NotImplementedException();
+            // override me
         }
     }
 }

@@ -46,6 +46,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="FluentValidation, Version=6.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\FluentValidation.6.1.0.0\lib\Net45\FluentValidation.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Microsoft.CodeDom.Providers.DotNetCompilerPlatform, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.1.0.0\lib\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll</HintPath>
       <Private>True</Private>
@@ -172,6 +176,9 @@
     <Compile Include="Server\HighFrequencyTimer.cs" />
     <Compile Include="Server\Planet.cs" />
     <Compile Include="Server\Player.cs" />
+    <Compile Include="Validators\LogonRequestValidator.cs" />
+    <Compile Include="Validators\MoveRequestValidator.cs" />
+    <Compile Include="Validators\StatusRequestValidator.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Areas\HelpPage\HelpPage.css" />
