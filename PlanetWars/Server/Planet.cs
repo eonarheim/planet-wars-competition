@@ -14,9 +14,9 @@ namespace PlanetWars.Server
         public Point Position { get; set; }
 
         /// <summary>
-        /// Owner string as guid, neutral player is zero guid
+        /// Owner string as guid, neutral player is -1
         /// </summary>
-        public string Owner { get; set; } = Guid.Empty.ToString();
+        public int OwnerId { get; set; } = -1;
 
     }
 }

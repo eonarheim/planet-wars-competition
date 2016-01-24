@@ -1,4 +1,5 @@
-﻿using CSharpAgent;
+﻿using AutoMapper;
+using CSharpAgent;
 using PlanetWars.Shared;
 using System;
 using System.Collections.Concurrent;
@@ -24,6 +25,10 @@ namespace PlanetWars.Server
         // todo planet generation
 
         private static int _MAXID = 0;
+        private int _MAXPLAYERID = 0;
+        private int _MAXPLANETID = 0;
+        private int _MAXFLEETID = 0;
+        private int _NUM_PLANETS = 4;
         private static readonly long START_DELAY = 10000; // 5 seconds
         private static readonly long PLAYER_TURN_LENGTH = 700; // 200 ms
         private static readonly long SERVER_TURN_LENGTH = 200; // 200 ms
@@ -42,6 +47,9 @@ namespace PlanetWars.Server
         private HighFrequencyTimer _gameLoop = null;
         public ConcurrentDictionary<string, Player> Players = new ConcurrentDictionary<string, Player>();
         public ConcurrentDictionary<string, Player> AuthTokens = new ConcurrentDictionary<string, Player>();
+
+        private List<Planet> _planets = new List<Planet>();
+        private List<Fleet> _fleets = new List<Fleet>();
 
         private DateTime gameStart;
         private DateTime endPlayerTurn;
@@ -78,9 +86,27 @@ namespace PlanetWars.Server
             Running = false;
             _started = false;
             _gameLoop = new HighFrequencyTimer(60, this.Update);
+            GenerateMap();
+
             gameStart = DateTime.UtcNow.AddMilliseconds(START_DELAY);
             endPlayerTurn = gameStart.AddMilliseconds(PLAYER_TURN_LENGTH);
             endServerTurn = endPlayerTurn.AddMilliseconds(SERVER_TURN_LENGTH);
+        }
+
+        private void GenerateMap()
+        {
+            for(var i = 0; i < _NUM_PLANETS; i++)
+            {
+                _planets.Add(new Planet()
+                {
+                    Id = _MAXPLANETID++,
+                    OwnerId = -1,
+                    Position = new Point(i * 4, i * 4),
+                    NumberOfShips = 40
+                });
+            }
+            _planets[0].OwnerId = 0;
+            _planets[_NUM_PLANETS - 1].OwnerId = 1;
         }
 
         public MoveResult MoveFleet(MoveRequest request)
@@ -96,12 +122,13 @@ namespace PlanetWars.Server
                 var newPlayer = new Player()
                 {
                     AuthToken = System.Guid.NewGuid().ToString(),
-                    PlayerName = playerName
+                    PlayerName = playerName,
+                    Id = _MAXPLAYERID++
                 };
 
                 var success = Players.TryAdd(playerName, newPlayer);
                 var success2 = AuthTokens.TryAdd(newPlayer.AuthToken, newPlayer);
-
+                
                 if (success && success2)
                 {
                     System.Diagnostics.Debug.WriteLine("Player logon [{0}]:[{1}]", newPlayer.PlayerName,
@@ -206,17 +233,21 @@ namespace PlanetWars.Server
 
         public StatusResult GetStatus(StatusRequest request)
         {
-            return new StatusResult()
+            var status = new StatusResult()
             {
-
-
                 IsGameOver = this.GameOver,
                 CurrentTurn = Turn,
                 NextTurnStart = endServerTurn,
-                EndOfCurrentTurn = endPlayerTurn
-
-
+                EndOfCurrentTurn = endPlayerTurn,
+                PlayerTurnLength = (int)PLAYER_TURN_LENGTH,
+                ServerTurnLength = (int)SERVER_TURN_LENGTH,
+                Planets = _planets.Select(p => Mapper.Map<Shared.Planet>(p)).ToList(),
+                Fleets = _fleets.Select(f => Mapper.Map<Shared.Fleet>(f)).ToList(),
+                PlayerA = 1,
+                PlayerB = 2
+               
             };
+            return status;
         }
     }
 }

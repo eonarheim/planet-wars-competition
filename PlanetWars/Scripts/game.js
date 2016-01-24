@@ -149,7 +149,7 @@ var Fleet = (function (_super) {
     Fleet.create = function (fleet) {
         var sp = GameSession.getPlanet(fleet.sourcePlanetId);
         var dp = GameSession.getPlanet(fleet.destinationPlanetId);
-        var co = GameSession.getOwnerColor(fleet.owner);
+        var co = GameSession.getOwnerColor(fleet.ownerId);
         return new Fleet(sp, dp, co);
     };
     Fleet.prototype.onInitialize = function () {

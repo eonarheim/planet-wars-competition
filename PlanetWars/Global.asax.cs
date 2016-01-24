@@ -1,4 +1,6 @@
-﻿using System;
+﻿using AutoMapper;
+using PlanetWars.Utility;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -18,6 +20,17 @@ namespace PlanetWars
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
+
+            // Configure AutoMapper
+            Mapper.CreateMap<Server.Planet, Shared.Planet>().IgnoreAllNonExisting();
+            Mapper.CreateMap<Server.Fleet, Shared.Fleet>().ForMember(
+                dest => dest.DestinationPlanetId,
+                opt => opt.MapFrom(src => src.Destination.Id)).ForMember(
+                dest => dest.SourcePlanetId,
+                opt => opt.MapFrom(src => src.Source.Id)).IgnoreAllNonExisting();
+
+
+            Mapper.AssertConfigurationIsValid();
         }
     }
 }

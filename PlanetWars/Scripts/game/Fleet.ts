@@ -15,7 +15,7 @@
    static create(fleet: Server.Fleet) {
       var sp = GameSession.getPlanet(fleet.sourcePlanetId);
       var dp = GameSession.getPlanet(fleet.destinationPlanetId);
-      var co = GameSession.getOwnerColor(fleet.owner);
+      var co = GameSession.getOwnerColor(fleet.ownerId);
 
       return new Fleet(sp, dp, co);
    }
