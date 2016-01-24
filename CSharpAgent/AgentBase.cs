@@ -24,6 +24,7 @@ namespace CSharpAgent
         public string AuthToken { get; set; }
         public string Name { get; set; }
         public int LastTurn { get; private set; }
+        public int MyId { get; private set; }
 
         public AgentBase(string name, string endpoint)
         {
@@ -32,6 +33,19 @@ namespace CSharpAgent
             _client = new HttpClient() { BaseAddress = new Uri(endpoint) };
             _client.DefaultRequestHeaders.Accept.Clear();
             _client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+        }
+
+        public void SendFleet(int sourcePlanetId, int destinationPlanetId, int numShips)
+        {
+            var moveRequest = new MoveRequest()
+            {
+                AuthToken = AuthToken,
+                GameId = GameId,
+                SourcePlanetId = sourcePlanetId,
+                DestinationPlanetId = destinationPlanetId,
+                NumberOfShips = numShips
+            };
+            _pendingMoveRequests.Add(moveRequest);
         }
 
         protected async Task<LogonResult> Logon()
@@ -47,6 +61,7 @@ namespace CSharpAgent
             }
             AuthToken = result.AuthToken;
             GameId = result.GameId;
+            MyId = result.Id;
             TimeToNextTurn = (long)result.GameStart.Subtract(DateTime.UtcNow).TotalMilliseconds;
             Console.WriteLine($"Your game Id is {result.GameId} auth {result.AuthToken} and starts in {TimeToNextTurn}ms");
             return result;

@@ -215,6 +215,7 @@ namespace PlanetWars.Server
 
 
                 result.AuthToken = newPlayer.AuthToken;
+                result.Id = newPlayer.Id;
                 result.GameId = Id;
                 result.GameStart = this.gameStart;
                 result.Success = true;
