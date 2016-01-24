@@ -24,8 +24,8 @@ namespace PlanetWars.Server
         // todo planet generation
 
         private static int _MAXID = 0;
-        private static readonly long START_DELAY = 5000; // 5 seconds
-        private static readonly long PLAYER_TURN_LENGTH = 200; // 200 ms
+        private static readonly long START_DELAY = 10000; // 5 seconds
+        private static readonly long PLAYER_TURN_LENGTH = 700; // 200 ms
         private static readonly long SERVER_TURN_LENGTH = 200; // 200 ms
         private static readonly int MAX_TURN = 200; // default 200 turns
 
@@ -37,12 +37,13 @@ namespace PlanetWars.Server
         public bool Waiting { get; internal set; }
         public bool GameOver { get; private set; }
         public int TIME_TO_WAIT { get; private set; }
+        public bool Processing { get; private set; }
 
         private HighFrequencyTimer _gameLoop = null;
         public ConcurrentDictionary<string, Player> Players = new ConcurrentDictionary<string, Player>();
         public ConcurrentDictionary<string, Player> AuthTokens = new ConcurrentDictionary<string, Player>();
 
-        private DateTime gameStart = DateTime.UtcNow.AddMilliseconds(START_DELAY);
+        private DateTime gameStart;
         private DateTime endPlayerTurn;
         private DateTime endServerTurn;
 
@@ -62,7 +63,7 @@ namespace PlanetWars.Server
             }
         }
 
-        
+
 
         public Game()
         {
@@ -72,11 +73,12 @@ namespace PlanetWars.Server
             }
 
             Id = _MAXID++;
-            
+
             Turn = 0;
             Running = false;
             _started = false;
             _gameLoop = new HighFrequencyTimer(60, this.Update);
+            gameStart = DateTime.UtcNow.AddMilliseconds(START_DELAY);
             endPlayerTurn = gameStart.AddMilliseconds(PLAYER_TURN_LENGTH);
             endServerTurn = endPlayerTurn.AddMilliseconds(SERVER_TURN_LENGTH);
         }
@@ -106,10 +108,11 @@ namespace PlanetWars.Server
                         newPlayer.AuthToken);
                 }
 
-                
+
                 result.AuthToken = newPlayer.AuthToken;
                 result.GameId = Id;
                 result.GameStart = this.gameStart;
+                result.Success = true;
             }
             else
             {
@@ -148,32 +151,32 @@ namespace PlanetWars.Server
             Running = false;
             _gameLoop.Stop();
         }
-               
+
 
         public void Update(long delta)
         {
             var currentTime = DateTime.UtcNow;
             if (this.Waiting)
             {
-               
-                if(currentTime > gameStart)
+
+                if (currentTime > gameStart)
                 {
-                    GameOver = true;
-                    this.Stop();
+                    this.Waiting = false;
                 }
                 return;
             }
-            
+
             if (GameOver)
             {
                 this.Stop();
                 return;
             }
-                        
+
             // check if we are in the server window
-            if(currentTime > endPlayerTurn && currentTime < endServerTurn)
+            if (currentTime > endPlayerTurn)
             {
                 // server processing                
+                Processing = true;
 
                 // Process ships movement
 
@@ -181,22 +184,20 @@ namespace PlanetWars.Server
 
                 // Resolve collisions
 
-                // Update scores            
-                    
+                // Update scores
 
                 // Turn complete
-                Turn++;
+                Turn++;                
                 endPlayerTurn = currentTime.AddMilliseconds(PLAYER_TURN_LENGTH);
-                endServerTurn = currentTime.AddMilliseconds(SERVER_TURN_LENGTH);
+                endServerTurn = endPlayerTurn.AddMilliseconds(SERVER_TURN_LENGTH);
+                Processing = false;
+                System.Diagnostics.Debug.WriteLine($"Game {Id} : Turn {Turn} : Next Turn Start {endServerTurn.Subtract(DateTime.UtcNow).TotalMilliseconds}ms");
 
+                // TODO UPDATE VIZ
             }
-            else
-            {
-                return;
-            }
-            
-            
-            if(Turn >= MAX_TURN)
+
+
+            if (Turn >= MAX_TURN)
             {
                 this.GameOver = true;
             }
@@ -208,14 +209,13 @@ namespace PlanetWars.Server
             return new StatusResult()
             {
 
-                
+
                 IsGameOver = this.GameOver,
                 CurrentTurn = Turn,
-                
-                //PlayerA = Players.Values;
-                
+                NextTurnStart = endServerTurn,
+                EndOfCurrentTurn = endPlayerTurn
 
-               
+
             };
         }
     }

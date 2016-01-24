@@ -15,8 +15,6 @@ namespace CSharpAgent
         {
             // do cool ai stuff
             Console.WriteLine($"[{DateTime.Now.ToShortTimeString()}]Current Turn: {gs.CurrentTurn}");
-            Console.WriteLine($"[{DateTime.Now.ToShortTimeString()}]End of Current Turn: {gs.EndOfCurrentTurn.ToLocalTime().ToLongTimeString()}");
-            Console.WriteLine($"[{DateTime.Now.ToShortTimeString()}]Start of Next Turn: {gs.NextTurnStart.ToLocalTime().ToLongTimeString()}");
         }
     }
 }

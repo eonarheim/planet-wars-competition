@@ -17,11 +17,13 @@ namespace CSharpAgent
         private List<MoveRequest> _pendingMoveRequests = new List<MoveRequest>();
 
         protected long TimeToNextTurn { get; set; }
+        protected int CurrentTurn { get; set; }
         protected int GameId { get; set; }
 
         // string guid that acts as an authorization token, definitely not crypto secure
         public string AuthToken { get; set; }
         public string Name { get; set; }
+        public int LastTurn { get; private set; }
 
         public AgentBase(string name, string endpoint)
         {
@@ -39,9 +41,14 @@ namespace CSharpAgent
                 AgentName = Name
             });
             var result = await response.Content.ReadAsAsync<LogonResult>();
+            if (!result.Success) {
+                Console.WriteLine($"Error talking to server {result.Message}");
+                throw new Exception("Could not talk to sever");
+            }
             AuthToken = result.AuthToken;
             GameId = result.GameId;
-            Console.WriteLine($"Your game Id is {result.GameId} auth {result.AuthToken} and starts at {result.GameStart.ToLocalTime().ToLongTimeString()}");
+            TimeToNextTurn = (long)result.GameStart.Subtract(DateTime.UtcNow).TotalMilliseconds;
+            Console.WriteLine($"Your game Id is {result.GameId} auth {result.AuthToken} and starts in {TimeToNextTurn}ms");
             return result;
         }
 
@@ -52,7 +59,14 @@ namespace CSharpAgent
                 GameId = GameId
             });
             var result = await response.Content.ReadAsAsync<StatusResult>();
-            TimeToNextTurn = result.NextTurnStart.Subtract(DateTime.UtcNow).Milliseconds;
+            if (!result.Success)
+            {
+                Console.WriteLine($"Error talking to server {result.Message}");
+                throw new Exception("Could not talk to sever");
+            }
+            TimeToNextTurn = (long)result.NextTurnStart.Subtract(DateTime.UtcNow).TotalMilliseconds;
+            CurrentTurn = result.CurrentTurn;
+            Console.WriteLine($"Next turn in {TimeToNextTurn}ms");
             return result;
         }
 
@@ -91,7 +105,7 @@ namespace CSharpAgent
                         _client.Dispose();
                         break;
                     }
-
+                    
                     Update(gs);
                     var ur = await SendUpdate(this._pendingMoveRequests);
                     this._pendingMoveRequests.Clear();

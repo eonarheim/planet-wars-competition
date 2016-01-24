@@ -79,6 +79,7 @@ namespace PlanetWars.Server
         {
             var game = Games[request.GameId];
             var result = game.GetStatus(request);
+            result.Success = true;
             return result;
         }
 
@@ -86,6 +87,7 @@ namespace PlanetWars.Server
         {
             var game = Games[request.GameId];
             var result = game.MoveFleet(request);
+            result.Success = true;
             return result;
         }
     }
