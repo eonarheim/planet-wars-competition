@@ -296,7 +296,7 @@ namespace PlanetWars.Server
                     // if the planet is not controlled by neutral update
                     if(planet.OwnerId != -1)
                     {
-                        planet.NumberOfShips += PLANET_GROWTH_RATE;
+                        planet.NumberOfShips += planet.GrowthRate;
                     }
                 }
 
@@ -369,6 +369,7 @@ namespace PlanetWars.Server
                 }
 
                 // Update scores
+                // todo check for game over conditions
 
                 // Turn complete
                 Turn++;                

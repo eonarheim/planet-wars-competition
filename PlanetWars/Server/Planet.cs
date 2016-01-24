@@ -12,6 +12,7 @@ namespace PlanetWars.Server
         public int Id { get; set; }
         public int NumberOfShips { get; set; }
         public Point Position { get; set; }
+        public int GrowthRate { get; set; } = 5;
 
         /// <summary>
         /// Owner string as guid, neutral player is -1

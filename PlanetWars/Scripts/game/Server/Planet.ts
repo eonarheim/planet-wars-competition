@@ -6,6 +6,7 @@ module Server {
         
         id: number;
         numberOfShips: number;
+        growthRate: number;
         size: number;
         position: Point;
         ownerId: number;

@@ -10,6 +10,7 @@ namespace PlanetWars.Shared
     {
         public int Id { get; set; }
         public int NumberOfShips { get; set; }
+        public int GrowthRate { get; set; };
         public int Size { get; set; }
         public Point Position { get; set; }
         public int OwnerId { get; set; } = -1;
