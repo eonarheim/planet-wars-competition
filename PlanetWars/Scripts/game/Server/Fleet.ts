@@ -7,6 +7,7 @@ module Server {
         id: number;
         ownerId: number;
         numberOfShips: number;
+        numberOfTurnsToDestination: number;
         sourcePlanetId: number;
         destinationPlanetId: number;
     }

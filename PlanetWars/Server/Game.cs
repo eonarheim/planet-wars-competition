@@ -33,6 +33,7 @@ namespace PlanetWars.Server
         private static readonly long PLAYER_TURN_LENGTH = 700; // 200 ms
         private static readonly long SERVER_TURN_LENGTH = 200; // 200 ms
         private static readonly int MAX_TURN = 200; // default 200 turns
+        private static readonly int PLANET_GROWTH_RATE = 5; // 5 ships per turn
 
         public static bool IsRunningLocally = HttpContext.Current.Request.IsLocal;
         public bool Running { get; private set; }
@@ -121,6 +122,10 @@ namespace PlanetWars.Server
             var destinationValid = _planets.FirstOrDefault(p => p.Id == request.DestinationPlanetId);
             if (sourceValid != null && destinationValid != null)
             {
+                // Subtract ships from planet
+                sourceValid.NumberOfShips -= request.NumberOfShips;
+
+                // Build fleet
                 var newFleet = new Fleet()
                 {
                     Id = _MAXFLEETID++,
@@ -279,10 +284,89 @@ namespace PlanetWars.Server
                 Processing = true;
 
                 // Send fleets 
+                foreach(var fleet in _fleets)
+                {
+                    // travel 1 unit distance each turn
+                    fleet.NumberOfTurnsToDestination--;
+                }
 
                 // Grow ships on planets
+                foreach(var planet in _planets)
+                {
+                    // if the planet is not controlled by neutral update
+                    if(planet.OwnerId != -1)
+                    {
+                        planet.NumberOfShips += PLANET_GROWTH_RATE;
+                    }
+                }
 
-                // Resolve collisions on done fleets
+                // Resolve collisions on arriving fleets
+                /*
+                foreach(var planet in _planets)
+                {
+                    var fleetsArriving = _fleets.Where(f => f.NumberOfTurnsToDestination <= 0 && f.Destination.Id == planet.Id).ToList();
+
+                    // build starting planet forces
+                    var neutralForce = 0;
+                    var p1Force = 0;
+                    var p2Force = 0;
+
+                    if(planet.OwnerId == -1)
+                    {
+                        neutralForce = planet.NumberOfShips;
+                    }
+
+                    if(planet.OwnerId == 1)
+                    {
+                        p1Force = planet.NumberOfShips;
+                        p1Force += fleetsArriving.Where(f => f.Owner == 1).Sum(f => f.NumberOfShips);
+                    }
+
+                    if(planet.OwnerId == 2)
+                    {
+                        p2Force = planet.NumberOfShips;
+                        p2Force += fleetsArriving.Where(f => f.Owner == 2).Sum(f => f.NumberOfShips);
+                    }
+                    
+                    if(p2Force > p1Force)
+                    {
+
+                    }
+                }*/
+
+
+                // first find the fleets that are done traveling
+                foreach(var fleet in _fleets.Where(f => f.NumberOfTurnsToDestination <= 0))
+                {
+                    // Fleet arrives at a friendly planet
+                    if(fleet.Destination.OwnerId == fleet.Owner)
+                    {
+                        fleet.Destination.NumberOfShips += fleet.NumberOfShips;
+                    }
+                    
+                    // Fleet arrives at a hostile planet
+                    if(fleet.Destination.OwnerId != fleet.Owner)
+                    {
+                        // Not enough ships to colonize
+                        if (fleet.Destination.NumberOfShips > fleet.NumberOfShips)
+                        {
+                            fleet.Destination.NumberOfShips -= fleet.NumberOfShips;
+                        }
+
+                        // Enough ships to colonize
+                        if(fleet.Destination.NumberOfShips < fleet.NumberOfShips)
+                        {
+                            fleet.Destination.NumberOfShips = fleet.NumberOfShips - fleet.Destination.NumberOfShips;
+                            fleet.Destination.OwnerId = fleet.Owner;
+                        }
+
+                        // If the net force is equal original owner retains the planet
+                        if(fleet.Destination.NumberOfShips == fleet.NumberOfShips)
+                        {
+                            fleet.Destination.NumberOfShips = 0;
+                        }
+                    }
+                }
 
                 // Update scores
 

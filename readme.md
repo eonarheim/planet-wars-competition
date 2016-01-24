@@ -24,7 +24,7 @@ The game is a draw when:
 
 Planets are laid out on a 2D grid. Each planet has an X and Y coordinate, an ID number, growth rate, and amount of ships required to colonize from the neutral player.
 
-The number of turns it takes a fleet to travel from a source planet to a destionation planet is given by the ceiling of euclidean distance between 2 planets:
+The number of turns it takes a fleet to travel from a source planet to a destination planet is given by the ceiling of euclidean distance between 2 planets:
 ```javascript
  Math.ceil(Math.sqrt(
         Math.pow(destination.x - source.x, 2) + 
@@ -34,6 +34,15 @@ The number of turns it takes a fleet to travel from a source planet to a destion
 To colonize a planet, ships must be sent in fleets in order to outnumber the current player's ships on the planet (neutral or hostile). However, once a fleet of ships is sent to another planet it cannot be stopped until it reaches its destination. Fleets sent will battle enemy ships and cancel out one for one. The player with ships left after battling has successfully colonized the planet.
 
 Once you a planet is colonized it will begin producing ships every turn based on the growth rate of the planet, which can they be used to colonize more planets.
+
+#### Simulation Phases In Order
+
+1. Departure - Agent commands are carried out. New fleets are created and the appropriate number of ships are removed from each planet. The fleet will arrive in X number of turns according to the formula above.
+
+2. Advancement - Fleets advance through space and `NumberOfTurnsToDestination` decrements by 1. Planets owned by players will increase their `NumberOfShips` by the growth rate of the planet.
+
+3. Arrival - Fleets that have a zero `NumberOfTurnsToDestination` arrive at destination planets and combat is resolved if necessary. The largest force will win with the number of ships equal to the largest force minus the second largest force. For example if player 1 has 5 ships arriving, player 2 has 4 ships arriving, and neutral occupies with 3 ships; player 1 will win and have a remaining force of 1 ship.
+ 
 
 ### Building an Agent
 
