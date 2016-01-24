@@ -12,6 +12,8 @@ namespace PlanetWars.Shared
         public bool Status { get; set; }
         public int PlayerA { get; set; }
         public int PlayerB { get; set; }
+        public int PlayerAScore { get; set; }
+        public int PlayerBScore { get; set; }
 
         public int CurrentTurn { get; set; }
         public DateTime EndOfCurrentTurn { get; set; }

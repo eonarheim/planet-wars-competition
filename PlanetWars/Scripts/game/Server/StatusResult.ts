@@ -8,6 +8,8 @@ module Server {
         status: boolean;
         playerA: number;
         playerB: number;
+        playerAScore: number;
+        playerBScore: number;
         currentTurn: number;
         endOfCurrentTurn: Date;
         nextTurnStart: Date;

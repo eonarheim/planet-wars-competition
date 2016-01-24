@@ -111,7 +111,80 @@ namespace PlanetWars.Server
 
         public MoveResult MoveFleet(MoveRequest request)
         {
-            throw new NotImplementedException();
+            var result = new MoveResult();
+            var validSourcePlanets = _getPlanetsForPlayer(request.AuthToken);
+
+            // A planet of the requested source ID exists, belongs to that planer, AND it has enough ships
+            var sourceValid = validSourcePlanets.FirstOrDefault(p => p.Id == request.SourcePlanetId && request.NumberOfShips <= p.NumberOfShips);
+
+            // A planet of the requested destination ID exists
+            var destinationValid = _planets.FirstOrDefault(p => p.Id == request.DestinationPlanetId);
+            if (sourceValid != null && destinationValid != null)
+            {
+                var newFleet = new Fleet()
+                {
+                    Id = _MAXFLEETID++,
+                    Owner = _authTokenToId(request.AuthToken),
+                    Source = sourceValid,
+                    Destination = destinationValid,
+                    NumberOfShips = request.NumberOfShips,
+                    NumberOfTurnsToDestination = (int)Math.Ceiling(sourceValid.Position.Distance(destinationValid.Position))
+                };
+                _fleets.Add(newFleet);
+                result.Fleet = Mapper.Map<Shared.Fleet>(newFleet);
+                result.Success = true;
+            }
+            else
+            {
+                result.Success = false;
+                result.Message = "Invalid move command, check if the planet of the requested source/dest ID exists, belongs to that player, AND it has enough ships.";
+            }
+            
+            
+            return result;
+        }
+
+        private int _authTokenToId(string authToken)
+        {
+            var player = Players.Values.Where(p => p.AuthToken == authToken).FirstOrDefault();
+            if(player != null)
+            {
+                return player.Id;
+            }
+            else
+            {
+                throw new ArgumentException("Invalid auth token, no player exists for that auth token!!!!");
+            }
+
+        }
+
+        private List<Planet> _getPlanetsForPlayer(string authToken)
+        {
+            var id = _authTokenToId(authToken);
+            return _getPlanetsForPlayer(id);
+        }
+
+        private List<Planet> _getPlanetsForPlayer(int id)
+        {
+            var planets = _planets.Where(p => p.OwnerId == id).ToList();
+            return planets;
+        }
+
+        private List<Fleet> _getFleetsForPlayer(string authToken)
+        {
+            var id = _authTokenToId(authToken);
+            return _getFleetsForPlayer(id);
+        }
+
+        private List<Fleet> _getFleetsForPlayer(int id)
+        {
+            var fleets = _fleets.Where(f => f.Owner == id).ToList();
+            return fleets;
+        }
+
+        private int _getPlayerScore(int id)
+        {
+            return _getFleetsForPlayer(id).Sum(f => f.NumberOfShips) + _getPlanetsForPlayer(id).Sum(p => p.NumberOfShips);
         }
 
         public LogonResult LogonPlayer(string playerName)
@@ -205,11 +278,11 @@ namespace PlanetWars.Server
                 // server processing                
                 Processing = true;
 
-                // Process ships movement
+                // Send fleets 
 
-                // Update ship counts
+                // Grow ships on planets
 
-                // Resolve collisions
+                // Resolve collisions on done fleets
 
                 // Update scores
 
@@ -244,8 +317,9 @@ namespace PlanetWars.Server
                 Planets = _planets.Select(p => Mapper.Map<Shared.Planet>(p)).ToList(),
                 Fleets = _fleets.Select(f => Mapper.Map<Shared.Fleet>(f)).ToList(),
                 PlayerA = 1,
-                PlayerB = 2
-               
+                PlayerAScore = _getPlayerScore(1),
+                PlayerB = 2,
+                PlayerBScore = _getPlayerScore(2)               
             };
             return status;
         }
