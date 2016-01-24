@@ -48,5 +48,6 @@
       this._v2.y = this.y;
 
       this.rotation = this._v1.subtract(this._v2).toAngle();
+      this._fleetLabel.rotation = -this.rotation;
    }
 }

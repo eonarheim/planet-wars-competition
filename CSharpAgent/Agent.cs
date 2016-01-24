@@ -28,7 +28,10 @@ namespace CSharpAgent
             foreach (var planet in gs.Planets.Where(p => p.OwnerId == MyId))
             {
                 var ships = (int)Math.Floor(planet.NumberOfShips / 2.0);
-                SendFleet(planet.Id, targetPlanet.Id, ships);
+                if (ships > 0)
+                {
+                    SendFleet(planet.Id, targetPlanet.Id, ships);
+                }
             }
         }
     }

@@ -51,6 +51,7 @@ var Fleet = (function (_super) {
         this._v2.x = this.x;
         this._v2.y = this.y;
         this.rotation = this._v1.subtract(this._v2).toAngle();
+        this._fleetLabel.rotation = -this.rotation;
     };
     return Fleet;
 })(ex.Actor);

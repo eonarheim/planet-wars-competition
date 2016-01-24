@@ -56,6 +56,8 @@ namespace PlanetWars.Server
         private DateTime endPlayerTurn;
         private DateTime endServerTurn;
 
+        private object synclock = new object();
+
         private bool _started;
         private bool serverComplete;
 
@@ -96,7 +98,7 @@ namespace PlanetWars.Server
 
         private void GenerateMap()
         {
-            for(var i = 0; i < _NUM_PLANETS; i++)
+            for (var i = 0; i < _NUM_PLANETS; i++)
             {
                 _planets.Add(new Planet()
                 {
@@ -109,10 +111,19 @@ namespace PlanetWars.Server
             _planets[0].OwnerId = 1;
             _planets[_NUM_PLANETS - 1].OwnerId = 2;
         }
-
+        
         public MoveResult MoveFleet(MoveRequest request)
         {
+
             var result = new MoveResult();
+            
+            // non-zero ships
+            if(request.NumberOfShips <= 0) {
+                result.Success = false;
+                result.Message = "Can't send a zero fleet";
+                return result;
+            }
+
             var validSourcePlanets = _getPlanetsForPlayer(request.AuthToken);
 
             // A planet of the requested source ID exists, belongs to that planer, AND it has enough ships
@@ -120,39 +131,46 @@ namespace PlanetWars.Server
 
             // A planet of the requested destination ID exists
             var destinationValid = _planets.FirstOrDefault(p => p.Id == request.DestinationPlanetId);
+
+
             if (sourceValid != null && destinationValid != null)
             {
-                // Subtract ships from planet
-                sourceValid.NumberOfShips -= request.NumberOfShips;
-
-                // Build fleet
-                var newFleet = new Fleet()
+                lock (synclock)
                 {
-                    Id = _MAXFLEETID++,
-                    OwnerId = _authTokenToId(request.AuthToken),
-                    Source = sourceValid,
-                    Destination = destinationValid,
-                    NumberOfShips = request.NumberOfShips,
-                    NumberOfTurnsToDestination = (int)Math.Ceiling(sourceValid.Position.Distance(destinationValid.Position))
-                };
-                _fleets.Add(newFleet);
-                result.Fleet = Mapper.Map<Shared.Fleet>(newFleet);
-                result.Success = true;
+                    // Subtract ships from planet
+                    sourceValid.NumberOfShips -= request.NumberOfShips;
+
+                    // Build fleet
+                    var newFleet = new Fleet()
+                    {
+                        Id = _MAXFLEETID++,
+                        OwnerId = _authTokenToId(request.AuthToken),
+                        Source = sourceValid,
+                        Destination = destinationValid,
+                        NumberOfShips = request.NumberOfShips,
+                        NumberOfTurnsToDestination = (int)Math.Ceiling(sourceValid.Position.Distance(destinationValid.Position))
+                    };
+
+                    _fleets.Add(newFleet);
+
+                    result.Fleet = Mapper.Map<Shared.Fleet>(newFleet);
+                    result.Success = true;
+                }
             }
             else
             {
                 result.Success = false;
                 result.Message = "Invalid move command, check if the planet of the requested source/dest ID exists, belongs to that player, AND it has enough ships.";
             }
-            
-            
+
+
             return result;
         }
 
         private int _authTokenToId(string authToken)
         {
             var player = Players.Values.Where(p => p.AuthToken == authToken).FirstOrDefault();
-            if(player != null)
+            if (player != null)
             {
                 return player.Id;
             }
@@ -206,7 +224,7 @@ namespace PlanetWars.Server
 
                 var success = Players.TryAdd(playerName, newPlayer);
                 var success2 = AuthTokens.TryAdd(newPlayer.AuthToken, newPlayer);
-                
+
                 if (success && success2)
                 {
                     System.Diagnostics.Debug.WriteLine("Player logon [{0}]:[{1}]", newPlayer.PlayerName,
@@ -285,68 +303,34 @@ namespace PlanetWars.Server
                 Processing = true;
 
                 // Send fleets 
-                foreach(var fleet in _fleets)
+                foreach (var fleet in _fleets.ToList())
                 {
                     // travel 1 unit distance each turn
                     fleet.NumberOfTurnsToDestination--;
                 }
 
                 // Grow ships on planets
-                foreach(var planet in _planets)
+                foreach (var planet in _planets)
                 {
                     // if the planet is not controlled by neutral update
-                    if(planet.OwnerId != -1)
+                    if (planet.OwnerId != -1)
                     {
                         planet.NumberOfShips += planet.GrowthRate;
                     }
                 }
-
-                // Resolve collisions on arriving fleets
-                /*
-                foreach(var planet in _planets)
-                {
-                    var fleetsArriving = _fleets.Where(f => f.NumberOfTurnsToDestination <= 0 && f.Destination.Id == planet.Id).ToList();
-
-                    // build starting planet forces
-                    var neutralForce = 0;
-                    var p1Force = 0;
-                    var p2Force = 0;
-
-                    if(planet.OwnerId == -1)
-                    {
-                        neutralForce = planet.NumberOfShips;
-                    }
-
-                    if(planet.OwnerId == 1)
-                    {
-                        p1Force = planet.NumberOfShips;
-                        p1Force += fleetsArriving.Where(f => f.Owner == 1).Sum(f => f.NumberOfShips);
-                    }
-
-                    if(planet.OwnerId == 2)
-                    {
-                        p2Force = planet.NumberOfShips;
-                        p2Force += fleetsArriving.Where(f => f.Owner == 2).Sum(f => f.NumberOfShips);
-                    }
-                    
-                    if(p2Force > p1Force)
-                    {
-
-                    }
-                }*/
-
+                
 
                 // first find the fleets that are done traveling
-                foreach(var fleet in _fleets.Where(f => f.NumberOfTurnsToDestination <= 0))
+                foreach (var fleet in _fleets.ToList().Where(f => f.NumberOfTurnsToDestination <= 0))
                 {
                     // Fleet arrives at a friendly planet
-                    if(fleet.Destination.OwnerId == fleet.OwnerId)
+                    if (fleet.Destination.OwnerId == fleet.OwnerId)
                     {
                         fleet.Destination.NumberOfShips += fleet.NumberOfShips;
                     }
-                    
+
                     // Fleet arrives at a hostile planet
-                    if(fleet.Destination.OwnerId != fleet.OwnerId)
+                    if (fleet.Destination.OwnerId != fleet.OwnerId)
                     {
                         // Not enough ships to colonize
                         if (fleet.Destination.NumberOfShips > fleet.NumberOfShips)
@@ -355,14 +339,14 @@ namespace PlanetWars.Server
                         }
 
                         // Enough ships to colonize
-                        if(fleet.Destination.NumberOfShips < fleet.NumberOfShips)
+                        if (fleet.Destination.NumberOfShips < fleet.NumberOfShips)
                         {
                             fleet.Destination.NumberOfShips = fleet.NumberOfShips - fleet.Destination.NumberOfShips;
                             fleet.Destination.OwnerId = fleet.OwnerId;
                         }
 
                         // If the net force is equal original owner retains the planet
-                        if(fleet.Destination.NumberOfShips == fleet.NumberOfShips)
+                        if (fleet.Destination.NumberOfShips == fleet.NumberOfShips)
                         {
                             fleet.Destination.NumberOfShips = 0;
                         }
@@ -370,13 +354,16 @@ namespace PlanetWars.Server
                 }
 
                 // remove finished fleets
-                _fleets.RemoveAll(f => f.NumberOfTurnsToDestination <= 0);
+                lock (synclock)
+                {
+                    _fleets.RemoveAll(f => f.NumberOfTurnsToDestination <= 0);
+                }
 
                 // Update scores
                 // todo check for game over conditions
 
                 // Turn complete
-                Turn++;                
+                Turn++;
                 endPlayerTurn = currentTime.AddMilliseconds(PLAYER_TURN_LENGTH);
                 endServerTurn = endPlayerTurn.AddMilliseconds(SERVER_TURN_LENGTH);
                 Processing = false;
@@ -403,12 +390,12 @@ namespace PlanetWars.Server
                 EndOfCurrentTurn = endPlayerTurn,
                 PlayerTurnLength = (int)PLAYER_TURN_LENGTH,
                 ServerTurnLength = (int)SERVER_TURN_LENGTH,
-                Planets = _planets.Select(p => Mapper.Map<Shared.Planet>(p)).ToList(),
-                Fleets = _fleets.Select(f => Mapper.Map<Shared.Fleet>(f)).ToList(),
+                Planets = _planets.ToList().Select(p => Mapper.Map<Shared.Planet>(p)).ToList(),
+                Fleets = _fleets.ToList().Select(f => Mapper.Map<Shared.Fleet>(f)).ToList(),
                 PlayerA = 1,
                 PlayerAScore = _getPlayerScore(1),
                 PlayerB = 2,
-                PlayerBScore = _getPlayerScore(2)               
+                PlayerBScore = _getPlayerScore(2)
             };
             return status;
         }

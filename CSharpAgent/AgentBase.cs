@@ -55,7 +55,8 @@ namespace CSharpAgent
                 AgentName = Name
             });
             var result = await response.Content.ReadAsAsync<LogonResult>();
-            if (!result.Success) {
+            if (!result.Success)
+            {
                 Console.WriteLine($"Error talking to server {result.Message}");
                 throw new Exception("Could not talk to sever");
             }
@@ -87,18 +88,12 @@ namespace CSharpAgent
 
         protected async Task<List<MoveResult>> SendUpdate(List<MoveRequest> moveCommands)
         {
-            var results = new List<MoveResult>();
-            foreach (var moveCommand in moveCommands)
+            var response = await _client.PostAsJsonAsync("api/move", moveCommands);
+            var results = await response.Content.ReadAsAsync<List<MoveResult>>();
+            foreach (var result in results)
             {
-                // todo use await task.whenAll
-                // ContinueWith(results into a list)
-                // Console.WriteLine(string.Format("posting move {0} for elevator {1}", moveCommand.Direction, moveCommand.ElevatorId));
-                var response = await _client.PostAsJsonAsync("api/move", moveCommand);
-                var result = await response.Content.ReadAsAsync<MoveResult>();
                 Console.WriteLine(result.Message);
-                results.Add(result);
-            }
-
+            }            
             return results;
         }
 
@@ -120,7 +115,7 @@ namespace CSharpAgent
                         _client.Dispose();
                         break;
                     }
-                    
+
                     Update(gs);
                     var ur = await SendUpdate(this._pendingMoveRequests);
                     this._pendingMoveRequests.Clear();
@@ -131,7 +126,7 @@ namespace CSharpAgent
                 }
             }
         }
-        
+
         public virtual void Update(StatusResult gs)
         {
             // override me

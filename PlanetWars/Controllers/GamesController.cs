@@ -76,19 +76,24 @@ namespace PlanetWars.Controllers
 
         [HttpPost]
         [Route("api/move")]
-        public BaseResult<MoveResult> Move(MoveRequest move)
+        public List<BaseResult<MoveResult>> Move(List<MoveRequest> moves)
         {
             var validator = new MoveRequestValidator();
-            var results = validator.Validate(move);
+            var results = new List<BaseResult<MoveResult>>();
+            foreach (var move in moves)
+            {
+                var result = validator.Validate(move);
 
-            if (results.IsValid)
-            {
-                return _gameManager.Execute(move);
+                if (result.IsValid)
+                {
+                    results.Add(_gameManager.Execute(move));
+                }
+                else
+                {
+                    results.Add(BaseResult<MoveResult>.Fail(errors: result.Errors.Select(e => e.ErrorMessage)));
+                }
             }
-            else
-            {
-                return BaseResult<MoveResult>.Fail(errors: results.Errors.Select(e => e.ErrorMessage));
-            }
+            return results;
         }
 
     }

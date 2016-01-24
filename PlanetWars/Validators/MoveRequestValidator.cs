@@ -18,6 +18,9 @@ namespace PlanetWars.Validators
                 .NotEmpty().WithMessage("Auth token not present, move command failed")
                 .Must(m => Guid.TryParse(m, out trash)).WithMessage("Auth token must be in guid format")
                 .Must(m => GameManager.Instance.GetAllAuthTokens().Contains(m)).WithMessage("No logon exists with the supplied authentication code");
+            RuleFor(m => m.GameId)
+                .Must(m => GameManager.Instance.Games[m].Turn > 0);
+                
         }
     }
 }
