@@ -24,7 +24,7 @@ class GameSession {
       var loader = new ex.Loader();      
       _.forIn(Assets, (a) => loader.addResource(a));
 
-      game.start(loader).then(GameSession.init);
+      game.start(loader).then(g => GameSession.init());
 
       GameSession.Game = game;
    }
@@ -36,10 +36,10 @@ class GameSession {
 
    static init() {
 
-      this.updateSessionState().then(() => {
+      GameSession.updateSessionState().then(() => {
 
-         this._turnTimer = new ex.Timer(() => this.updateSessionState(), this.getTurnDuration(), true);
-
+         GameSession._turnTimer = new ex.Timer(() => GameSession.updateSessionState(), GameSession.getTurnDuration(), true);
+         GameSession.Game.add(GameSession._turnTimer);
       });
 
    }
@@ -60,12 +60,12 @@ class GameSession {
       var pyMax = _.max(py);
 
       // relative scale factors
-      var sfx = (pxMax - pxMin) / pxMax;
-      var sfy = (pyMax - pyMin) / pyMax;
+      var sfx = p.x / pxMax;
+      var sfy = p.y / pyMax;
 
       // position in grid world will be 
-      var x = p.x * (sfx * Config.MapSize);
-      var y = p.y * (sfy * Config.MapSize);
+      var x = (sfx * Config.MapSize);
+      var y = (sfy * Config.MapSize);
 
       // drawable space starts after padding
       x += Config.MapPadding;
@@ -76,44 +76,52 @@ class GameSession {
 
    static updateSessionState(): JQueryPromise<Server.StatusResult> {
 
-      return $.post("/api/status", { gameId: this.Id }).then(s => {
+      return $.post("/api/status", { gameId: GameSession.Id }).then(s => {
          GameSession.State = <Server.StatusResult>s;
 
          // add planets to game
          _.each(GameSession.State.planets, (p) => {
             var planet = new Planet(p);
 
-            if (!this._planets[p.id]) {
-               this.Game.add(planet);
+            if (!GameSession._planets[p.id]) {
+               GameSession.Game.add(planet);
+               GameSession._planets[p.id] = planet;
+            } else {
+               GameSession._planets[p.id].updateState(p);
             }
-            this._planets[p.id] = planet;
          });
 
          // add fleets
          _.each(GameSession.State.fleets, (f) => {
             var fleet = Fleet.create(f);
-            if (!this._fleets[f.id]) {
-               this.Game.add(fleet);
-            }
-            this._fleets[f.id] = fleet;            
+            if (!GameSession._fleets[f.id]) {
+               GameSession.Game.add(fleet);
+               GameSession._fleets[f.id] = fleet;
+            }      
          });
       });
 
    }
 
    static getPlanet(planetId: number) {
-      if (!this._planets[planetId]) {
+      if (!GameSession._planets[planetId]) {
          throw "Planet does not exist";
       }
 
-      return this._planets[planetId];
+      return GameSession._planets[planetId];
    }
 
    static getOwnerColor(ownerId: number) {
-      return this.State.playerA === ownerId ? Config.PlayerAColor : Config.PlayerBColor;
+      if (ownerId == GameSession.State.playerA) {
+         return Config.PlayerAColor;
+      }
+      if (ownerId == GameSession.State.playerB) {
+         return Config.PlayerBColor;
+      }
+      return Config.PlanetNeutralColor;
    }
 
    static getTurnDuration() {
-      return this.State.playerTurnLength + this.State.serverTurnLength;
+      return GameSession.State.playerTurnLength + GameSession.State.serverTurnLength;
    }
 }

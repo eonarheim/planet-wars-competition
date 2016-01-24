@@ -16,6 +16,10 @@
       this.updateState(planet);
    }
 
+   getServerCoord() : ex.Point {
+      return new ex.Point(this._planet.position.x, this._planet.position.y);
+   }
+
    onInitialize(engine: ex.Engine) {
       super.onInitialize(engine);
 
@@ -45,13 +49,13 @@
    }
 
    draw(ctx: CanvasRenderingContext2D, delta: number) {
-      super.draw(ctx, delta);
-
       // draw an ellipse
       ctx.beginPath();
       ctx.arc(this.x, this.y, this.getWidth(), 0, Math.PI * 2);
       ctx.fillStyle = this._planetColor.toString();
       ctx.closePath();
       ctx.fill();
+
+      super.draw(ctx, delta);
    }
 }

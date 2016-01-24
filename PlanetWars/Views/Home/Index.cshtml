@@ -18,8 +18,9 @@
             $.getJSON("/api/games").then(function (games) {
                 if (!games || !games.length) return;
 
+                $("#games").empty();
                 $.each(games, function(index, game) {
-                    $("#games").append("<li><a href='/games/" + game.id + "'>#" + game.id + " (" + game.players.join(",") +")</a></li>");
+                    $("#games").append("<li><a href='/home/game/" + game.gameId + "'>#" + game.gameId + " (" + game.players.join(",") +")</a></li>");
                 });
             });
 
