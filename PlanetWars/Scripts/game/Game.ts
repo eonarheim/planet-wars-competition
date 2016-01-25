@@ -15,6 +15,7 @@ class GameSession {
 
       var game = new ex.Engine({
          canvasElementId: "game",
+         displayMode: ex.DisplayMode.Container,
          height: 480,
          width: 720         
       });
@@ -44,8 +45,10 @@ class GameSession {
 
    }
 
-   static mapPlanetSize(s: number) {
-      return ((Config.PlanetMaxSize - Config.PlanetMinSize) / Config.PlanetMaxSize) * s;
+   static mapPlanetSize(growthRate: number) {
+      var sf = growthRate / _.max(_.map(GameSession.State.planets, p => p.growthRate));
+
+      return ex.Util.clamp(sf * Config.PlanetMaxSize, Config.PlanetMinSize, Config.PlanetMaxSize);
    }
 
    static mapServerCoordsToWorld(p: Server.Point): ex.Point {

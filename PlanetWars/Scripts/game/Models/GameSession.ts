@@ -5,6 +5,6 @@ module Models {
     export interface IGameSession {
         
         gameId: number;
-        players: string[];
+        players: { [key: number]: string; };
     }
 }

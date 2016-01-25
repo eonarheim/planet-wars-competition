@@ -30,7 +30,7 @@ namespace PlanetWars.Controllers
                 yield return new GameSession()
                 {
                     GameId = game.Key,
-                    Players = game.Value.Players.Select(x => x.Key).ToArray()
+                    Players = game.Value.Players.ToDictionary(kv => kv.Value.Id, kv => kv.Value.PlayerName)
                 };
             }
         }

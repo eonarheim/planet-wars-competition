@@ -20,7 +20,7 @@
 
                 $("#games").empty();
                 $.each(games, function(index, game) {
-                    $("#games").append("<li><a href='/home/game/" + game.gameId + "'>#" + game.gameId + " (" + game.players.join(",") +")</a></li>");
+                    $("#games").append("<li><a href='/home/game/" + game.gameId + "'>#" + game.gameId + " (" + _.values(game.players).join(",") +")</a></li>");
                 });
             });
 

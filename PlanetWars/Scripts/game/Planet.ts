@@ -6,7 +6,7 @@
 
    constructor(planet: Server.Planet) {
       var p = GameSession.mapServerCoordsToWorld(planet.position);
-      var s = GameSession.mapPlanetSize(planet.size);
+      var s = GameSession.mapPlanetSize(planet.growthRate);
 
       super(p.x, p.y, s, s);
 
@@ -49,9 +49,9 @@
    }
 
    draw(ctx: CanvasRenderingContext2D, delta: number) {
-      // draw an ellipse
+      // draw an ellipse (width = diameter)
       ctx.beginPath();
-      ctx.arc(this.x, this.y, this.getWidth(), 0, Math.PI * 2);
+      ctx.arc(this.x, this.y, this.getWidth() / 2, 0, Math.PI * 2);
       ctx.fillStyle = this._planetColor.toString();
       ctx.closePath();
       ctx.fill();

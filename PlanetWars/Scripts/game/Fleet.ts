@@ -24,6 +24,9 @@
       return new Fleet(sp, dp, co, ships);
    }
 
+   private _v1: ex.Vector = new ex.Vector(0, 0);
+   private _v2: ex.Vector = new ex.Vector(0, 0);
+
    onInitialize(engine) {
       super.onInitialize(engine);
 
@@ -33,15 +36,6 @@
 
       this.add(this._fleetLabel);
 
-      this.moveBy(this._dest.x, this._dest.y, GameSession.getTurnDuration() * (this._turns-1)).asPromise().then(() => this.kill());
-   }
-
-   private _v1: ex.Vector = new ex.Vector(0, 0);
-   private _v2: ex.Vector = new ex.Vector(0, 0);
-
-   update(engine: ex.Engine, delta: number) {
-      super.update(engine, delta);
-
       this._v1.x = this._dest.x;
       this._v1.y = this._dest.y;
       this._v2.x = this.x;
@@ -49,5 +43,11 @@
 
       this.rotation = this._v1.subtract(this._v2).toAngle();
       this._fleetLabel.rotation = -this.rotation;
+
+      this.moveBy(this._dest.x, this._dest.y, GameSession.getTurnDuration() * (this._turns-1)).asPromise().then(() => this.kill());
+   }
+   
+   update(engine: ex.Engine, delta: number) {
+      super.update(engine, delta);      
    }
 }

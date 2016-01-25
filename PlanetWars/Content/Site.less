@@ -1,0 +1,53 @@
+﻿body {
+    padding-top: 50px;
+    padding-bottom: 20px;
+}
+
+/* Set padding to keep content from hitting the edges */
+.body-content {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+/* Set width on the form input elements since they're 100% wide by default */
+input,
+select,
+textarea {
+    max-width: 280px;
+}
+
+/* Game CSS */
+.game-container {
+    position: relative;
+    background: black;
+    padding: 2em;
+
+    color: white;
+
+    #game-id { 
+        top: 2em;
+        font-weight: bold; 
+        font-size: 20px; 
+        position: absolute;
+        z-index: 1;
+        margin: 0;
+    }
+    #game-players { 
+        font-weight: bold; 
+        font-size: 16px; 
+        color: lime; 
+        position: absolute;
+        top: 5em;
+        z-index: 1;
+        margin: 0;
+    }
+
+    canvas#game {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        margin: 0 auto;
+    }
+}
