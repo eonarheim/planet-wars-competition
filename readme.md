@@ -2,6 +2,8 @@
 
 # Planet Wars AI Competition
 
+![Planet Wars](https://zippy.gfycat.com/BraveBlushingImpala.gif)
+
 ### Game Overview
 
 In this game you will build and AI to compete to colonize all of the available planets or destroy all enemy ships. On each turn, a player may send a fleets of ships from planets they control to other planets. 
