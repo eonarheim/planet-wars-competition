@@ -56,13 +56,23 @@ All agents must provide a command line argument to change the endpoint they are 
 
 For example:
 ```bash
->runmyagent.exe -endpoint http://planet-wars-game.com 
+>runmyagent.exe -endpoint http://my-planet-wars-game.com:1337
 ```
 
-### Running the Server
+### Getting started locally Running the Server
  
-You may run the server locally by starting the "PlanetWars" project in visual studio. Once you have a local server, you can point your agent at the local endpoint.
+First clone the repository locally using git (github for windows is good)
 
-### API
+```bash
+git clone https://github.com/eonarheim/planet-wars-competition.git`
+```
+
+Open the solution in VS 2015 (community is free https://www.visualstudio.com/en-us/products/vs-2015-product-editions.aspx)
+
+You may run the server locally by starting the "PlanetWars" web project in visual studio. Once you have a local server, you can point your agent at the local endpoint.
+
+There is a prebuilt agent you can build off of :)
+
+
 
 
