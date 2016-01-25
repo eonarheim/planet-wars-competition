@@ -18,30 +18,58 @@ textarea {
   position: relative;
   background: black;
   padding: 2em;
+  text-align: center;
   color: white;
 }
-.game-container #game-id {
+.game-container .game-info {
   top: 2em;
+  z-index: 1;
   font-weight: bold;
   font-size: 20px;
   position: absolute;
-  z-index: 1;
-  margin: 0;
+  text-align: left;
+}
+.game-container #game-id {
+  font-weight: bold;
+  font-size: 20px;
+  margin: 0 0 6px 0;
+}
+.game-container #game-turns {
+  font-size: 18px;
+  color: #666;
+  margin: 0 0 12px 0;
+}
+.game-container #game-turns span {
+  color: white;
 }
 .game-container #game-players {
   font-weight: bold;
-  font-size: 16px;
+  font-size: 25px;
   color: lime;
-  position: absolute;
-  top: 5em;
-  z-index: 1;
-  margin: 0;
+  margin: 0 0 6px 0;
 }
-.game-container canvas#game {
+.game-container #game-players li span {
+  color: white;
+}
+.game-container #game-players li[data-id='1'] {
+  color: #c53e30;
+}
+.game-container #game-players li[data-id='2'] {
+  color: #3797bf;
+}
+.game-container #game-over {
+  display: none;
+  color: #cabd4f;
+  font-size: 25px;
+  font-weight: bold;
+}
+.game-container .game-canvas {
+  margin: 0 auto;
+}
+.game-container .game-canvas canvas#game {
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  margin: 0 auto;
 }
