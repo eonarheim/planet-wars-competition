@@ -3,6 +3,7 @@
 /// <reference path="Config.ts"/>
 /// <reference path="Assets.ts"/>
 /// <reference path="Planet.ts"/>
+/// <reference path="Fleet.ts"/>
 
 class GameSession {
    
@@ -21,7 +22,7 @@ class GameSession {
 
       // load assets
       var loader = new ex.Loader();      
-      _.forIn(Assets, (a) => loader.addResource(a));
+      _.forIn(Assets, (a: ex.ILoadable) => loader.addResource(a));
 
       game.start(loader).then(g => GameSession.init());
 
@@ -68,17 +69,13 @@ class GameSession {
       // position in grid world will be 
       var x = (sfx * Config.MapSize);
       var y = (sfy * Config.MapSize);
-
-      // drawable space starts after padding
-      x += Config.MapPadding;
-      y += Config.MapPadding;
-
+      
       // center map
       var vw = GameSession.Game.getWidth();
       var vh = GameSession.Game.getHeight();
 
-      x = ((vw / 2) - Config.MapSize) + x;
-      y = ((vh / 2) - Config.MapSize) + y;
+      x = ((vw / 2) - (Config.MapSize / 2)) + x;
+      y = ((vh / 2) - (Config.MapSize / 2)) + y;
 
       return new ex.Point(x, y);
    }
@@ -145,6 +142,6 @@ class GameSession {
    }
 
    static getTurnDuration() {
-      return GameSession.State.playerTurnLength + GameSession.State.serverTurnLength;
+      return GameSession.State.playerTurnLength; // + GameSession.State.serverTurnLength;
    }
 }

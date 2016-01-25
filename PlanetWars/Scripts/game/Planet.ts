@@ -9,7 +9,7 @@
       var s = GameSession.mapPlanetSize(planet.growthRate);
 
       super(p.x, p.y, s, s);
-
+      
       this._planetColor = Config.PlanetNeutralColor;
       this._initialShips = planet.numberOfShips;
 
@@ -23,12 +23,17 @@
    onInitialize(engine: ex.Engine) {
       super.onInitialize(engine);
 
-      this._shipLabel = new ex.Label(null, 0, (this.getHeight() / 2) - 16, 'Segoe UI Black, Verdana');
+      this._shipLabel = new ex.Label(null, 0, 0, 'Segoe UI Black, Verdana');
       this._shipLabel.fontSize = 14;
       this._shipLabel.color = ex.Color.White;
       this._shipLabel.textAlign = ex.TextAlign.Center;
+      this._shipLabel.baseAlign = ex.BaseAlign.Middle;
 
       this.add(this._shipLabel);
+
+      this.on('predraw', (e: ex.PreDrawEvent) => {
+         this.predraw(e.ctx, e.delta);
+      });
    }
 
    updateState(planet: Server.Planet) {
@@ -49,14 +54,13 @@
       }
    }
 
-   draw(ctx: CanvasRenderingContext2D, delta: number) {
+   predraw(ctx: CanvasRenderingContext2D, delta: number) {
+      
       // draw an ellipse (width = diameter)
       ctx.beginPath();
-      ctx.arc(this.x, this.y, this.getWidth() / 2, 0, Math.PI * 2);
+      ctx.arc(0, 0, this.getWidth() / 2, 0, Math.PI * 2);
       ctx.fillStyle = this._planetColor.toString();
       ctx.closePath();
       ctx.fill();
-      
-      super.draw(ctx, delta);
    }
 }

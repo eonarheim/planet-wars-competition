@@ -19,15 +19,16 @@
    // fleets
    //
    FleetWidth: 6,
-   FleetHeight: 7,   
+   FleetHeight: 7,  
+   FleetAnimSpeed: 400, 
 
    //
    // planets
    //
 
    // Size of planet * factor = world size
-   PlanetMinSize: 15,
-   PlanetMaxSize: 50,
+   PlanetMinSize: 25,
+   PlanetMaxSize: 120,
    PlanetNeutralColor: ex.Color.Gray,
 
    //

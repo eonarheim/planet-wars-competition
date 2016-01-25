@@ -1,8 +1,8 @@
-﻿var Assets: {[key: string]: ex.ILoadable} = {
-   
+﻿var Assets = {
+
    // tx
-   //TextureTest: null
+   TextureFleets: new ex.Texture("/Content/Images/spaceship.png")
 
    // snd   
 
-}
+};

@@ -4,9 +4,12 @@
    private _turns: number;
    private _fleetLabel: ex.Label;
    private _ships: number;
+   private static _sheet: ex.SpriteSheet;
 
-   constructor(sp: Planet, dp: Planet, color: ex.Color, ships: number) {
-      super(sp.x, sp.y, Config.FleetWidth, Config.FleetHeight, color);
+   constructor(sp: Planet, dp: Planet, anim: ex.Animation, ships: number) {
+      super(sp.x, sp.y, Config.FleetWidth, Config.FleetHeight);
+
+      this.addDrawing('default', anim);
       this._ships = ships;
       this._dest = dp;
       var spsc = sp.getServerCoord();
@@ -19,9 +22,21 @@
    static create(fleet: Server.Fleet) {
       var sp = GameSession.getPlanet(fleet.sourcePlanetId);
       var dp = GameSession.getPlanet(fleet.destinationPlanetId);
-      var co = GameSession.getOwnerColor(fleet.ownerId);
       var ships = fleet.numberOfShips;
-      return new Fleet(sp, dp, co, ships);
+
+      if (!Fleet._sheet) {
+         Fleet._sheet = new ex.SpriteSheet(Assets.TextureFleets, 4, 1, 12, 10);
+      }
+
+      var anim: ex.Animation;
+
+      if (fleet.ownerId === GameSession.State.playerA) {
+         anim = Fleet._sheet.getAnimationBetween(GameSession.Game, 0, 1, Config.FleetAnimSpeed);
+      } else {
+         anim = Fleet._sheet.getAnimationBetween(GameSession.Game, 2, 3, Config.FleetAnimSpeed);
+      }
+      
+      return new Fleet(sp, dp, anim, ships);
    }
 
    private _v1: ex.Vector = new ex.Vector(0, 0);
@@ -44,10 +59,6 @@
       this.rotation = this._v1.subtract(this._v2).toAngle();
       this._fleetLabel.rotation = -this.rotation;
 
-      this.moveBy(this._dest.x, this._dest.y, GameSession.getTurnDuration() * (this._turns-1)).asPromise().then(() => this.kill());
-   }
-   
-   update(engine: ex.Engine, delta: number) {
-      super.update(engine, delta);      
+      this.moveBy(this._dest.x, this._dest.y, GameSession.getTurnDuration() * this._turns).asPromise().then(() => this.kill());
    }
 }

@@ -1,4 +1,6 @@
-var Assets = {};
+var Assets = {
+    TextureFleets: new ex.Texture("/Content/Images/spaceship.png")
+};
 var Config = {
     MapPadding: 50,
     MapSize: 400,
@@ -13,8 +15,9 @@ var Config = {
     StarfieldMeteorSpeed: 320,
     FleetWidth: 6,
     FleetHeight: 7,
-    PlanetMinSize: 15,
-    PlanetMaxSize: 50,
+    FleetAnimSpeed: 400,
+    PlanetMinSize: 25,
+    PlanetMaxSize: 120,
     PlanetNeutralColor: ex.Color.Gray,
     PlayerAColor: ex.Color.fromHex("#c53e30"),
     PlayerBColor: ex.Color.fromHex("#3797bf")
@@ -24,6 +27,53 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
+var Fleet = (function (_super) {
+    __extends(Fleet, _super);
+    function Fleet(sp, dp, anim, ships) {
+        _super.call(this, sp.x, sp.y, Config.FleetWidth, Config.FleetHeight);
+        this._v1 = new ex.Vector(0, 0);
+        this._v2 = new ex.Vector(0, 0);
+        this.addDrawing('default', anim);
+        this._ships = ships;
+        this._dest = dp;
+        var spsc = sp.getServerCoord();
+        var dpsc = dp.getServerCoord();
+        this._turns = Math.ceil(Math.sqrt(Math.pow(dpsc.x - spsc.x, 2) +
+            Math.pow(dpsc.y - spsc.y, 2)));
+    }
+    Fleet.create = function (fleet) {
+        var sp = GameSession.getPlanet(fleet.sourcePlanetId);
+        var dp = GameSession.getPlanet(fleet.destinationPlanetId);
+        var ships = fleet.numberOfShips;
+        if (!Fleet._sheet) {
+            Fleet._sheet = new ex.SpriteSheet(Assets.TextureFleets, 4, 1, 12, 10);
+        }
+        var anim;
+        if (fleet.ownerId === GameSession.State.playerA) {
+            anim = Fleet._sheet.getAnimationBetween(GameSession.Game, 0, 1, Config.FleetAnimSpeed);
+        }
+        else {
+            anim = Fleet._sheet.getAnimationBetween(GameSession.Game, 2, 3, Config.FleetAnimSpeed);
+        }
+        return new Fleet(sp, dp, anim, ships);
+    };
+    Fleet.prototype.onInitialize = function (engine) {
+        var _this = this;
+        _super.prototype.onInitialize.call(this, engine);
+        this._fleetLabel = new ex.Label("" + this._ships, 0, 10, 'Arial');
+        this._fleetLabel.color = ex.Color.White;
+        this._fleetLabel.textAlign = ex.TextAlign.Center;
+        this.add(this._fleetLabel);
+        this._v1.x = this._dest.x;
+        this._v1.y = this._dest.y;
+        this._v2.x = this.x;
+        this._v2.y = this.y;
+        this.rotation = this._v1.subtract(this._v2).toAngle();
+        this._fleetLabel.rotation = -this.rotation;
+        this.moveBy(this._dest.x, this._dest.y, GameSession.getTurnDuration() * this._turns).asPromise().then(function () { return _this.kill(); });
+    };
+    return Fleet;
+})(ex.Actor);
 var Planet = (function (_super) {
     __extends(Planet, _super);
     function Planet(planet) {
@@ -38,12 +88,17 @@ var Planet = (function (_super) {
         return new ex.Point(this._planet.position.x, this._planet.position.y);
     };
     Planet.prototype.onInitialize = function (engine) {
+        var _this = this;
         _super.prototype.onInitialize.call(this, engine);
-        this._shipLabel = new ex.Label(null, 0, (this.getHeight() / 2) - 16, 'Segoe UI Black, Verdana');
+        this._shipLabel = new ex.Label(null, 0, 0, 'Segoe UI Black, Verdana');
         this._shipLabel.fontSize = 14;
         this._shipLabel.color = ex.Color.White;
         this._shipLabel.textAlign = ex.TextAlign.Center;
+        this._shipLabel.baseAlign = ex.BaseAlign.Middle;
         this.add(this._shipLabel);
+        this.on('predraw', function (e) {
+            _this.predraw(e.ctx, e.delta);
+        });
     };
     Planet.prototype.updateState = function (planet) {
         this._planet = planet;
@@ -61,13 +116,12 @@ var Planet = (function (_super) {
             this._planetColor = Config.PlanetNeutralColor;
         }
     };
-    Planet.prototype.draw = function (ctx, delta) {
+    Planet.prototype.predraw = function (ctx, delta) {
         ctx.beginPath();
-        ctx.arc(this.x, this.y, this.getWidth() / 2, 0, Math.PI * 2);
+        ctx.arc(0, 0, this.getWidth() / 2, 0, Math.PI * 2);
         ctx.fillStyle = this._planetColor.toString();
         ctx.closePath();
         ctx.fill();
-        _super.prototype.draw.call(this, ctx, delta);
     };
     return Planet;
 })(ex.Actor);
@@ -108,12 +162,10 @@ var GameSession = (function () {
         var sfy = p.y / pyMax;
         var x = (sfx * Config.MapSize);
         var y = (sfy * Config.MapSize);
-        x += Config.MapPadding;
-        y += Config.MapPadding;
         var vw = GameSession.Game.getWidth();
         var vh = GameSession.Game.getHeight();
-        x = ((vw / 2) - Config.MapSize) + x;
-        y = ((vh / 2) - Config.MapSize) + y;
+        x = ((vw / 2) - (Config.MapSize / 2)) + x;
+        y = ((vh / 2) - (Config.MapSize / 2)) + y;
         return new ex.Point(x, y);
     };
     GameSession.updateSessionState = function () {
@@ -163,52 +215,12 @@ var GameSession = (function () {
         return Config.PlanetNeutralColor;
     };
     GameSession.getTurnDuration = function () {
-        return GameSession.State.playerTurnLength + GameSession.State.serverTurnLength;
+        return GameSession.State.playerTurnLength;
     };
     GameSession._planets = [];
     GameSession._fleets = [];
     return GameSession;
 })();
-var Fleet = (function (_super) {
-    __extends(Fleet, _super);
-    function Fleet(sp, dp, color, ships) {
-        _super.call(this, sp.x, sp.y, Config.FleetWidth, Config.FleetHeight, color);
-        this._v1 = new ex.Vector(0, 0);
-        this._v2 = new ex.Vector(0, 0);
-        this._ships = ships;
-        this._dest = dp;
-        var spsc = sp.getServerCoord();
-        var dpsc = dp.getServerCoord();
-        this._turns = Math.ceil(Math.sqrt(Math.pow(dpsc.x - spsc.x, 2) +
-            Math.pow(dpsc.y - spsc.y, 2)));
-    }
-    Fleet.create = function (fleet) {
-        var sp = GameSession.getPlanet(fleet.sourcePlanetId);
-        var dp = GameSession.getPlanet(fleet.destinationPlanetId);
-        var co = GameSession.getOwnerColor(fleet.ownerId);
-        var ships = fleet.numberOfShips;
-        return new Fleet(sp, dp, co, ships);
-    };
-    Fleet.prototype.onInitialize = function (engine) {
-        var _this = this;
-        _super.prototype.onInitialize.call(this, engine);
-        this._fleetLabel = new ex.Label("" + this._ships, 0, 10, 'Arial');
-        this._fleetLabel.color = ex.Color.White;
-        this._fleetLabel.textAlign = ex.TextAlign.Center;
-        this.add(this._fleetLabel);
-        this._v1.x = this._dest.x;
-        this._v1.y = this._dest.y;
-        this._v2.x = this.x;
-        this._v2.y = this.y;
-        this.rotation = this._v1.subtract(this._v2).toAngle();
-        this._fleetLabel.rotation = -this.rotation;
-        this.moveBy(this._dest.x, this._dest.y, GameSession.getTurnDuration() * (this._turns - 1)).asPromise().then(function () { return _this.kill(); });
-    };
-    Fleet.prototype.update = function (engine, delta) {
-        _super.prototype.update.call(this, engine, delta);
-    };
-    return Fleet;
-})(ex.Actor);
 var Starfield = (function (_super) {
     __extends(Starfield, _super);
     function Starfield() {
