@@ -54,7 +54,7 @@ namespace PlanetWars.Server
 
         public List<Game> GetAllActiveGames()
         {
-            return Games.Values.Where(g => g.Running == true).ToList();
+            return Games.Values.Where(g => g.Running == true || g.GameOver == true).ToList();
         }
                        
         public LogonResult Execute(LogonRequest request)
@@ -71,6 +71,7 @@ namespace PlanetWars.Server
                 game = GetNewGame();
                 game.Waiting = true;
                 game.Start();
+                game.StartDemoAgent("Demo");
                 return game.LogonPlayer(request.AgentName);
             }            
         }
