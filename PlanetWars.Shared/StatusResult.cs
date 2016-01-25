@@ -9,7 +9,7 @@ namespace PlanetWars.Shared
     public class StatusResult : BaseResult<StatusResult>
     {
         public bool IsGameOver { get; set; }
-        public bool Status { get; set; }
+        public string Status { get; set; }
         public int PlayerA { get; set; }
         public int PlayerB { get; set; }
         public int PlayerAScore { get; set; }
@@ -24,5 +24,7 @@ namespace PlanetWars.Shared
 
         public List<Planet> Planets { get; set;}
         public List<Fleet> Fleets { get; set; }
+        public List<int> PlayerAScoreOverTime { get; set; }
+        public List<int> PlayerBScoreOverTime { get; set; }
     }
 }

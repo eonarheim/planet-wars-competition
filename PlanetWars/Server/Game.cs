@@ -51,15 +51,16 @@ namespace PlanetWars.Server
         private List<Planet> _planets = new List<Planet>();
         private List<Fleet> _fleets = new List<Fleet>();
 
+        public List<int> PlayerAScoreOverTime = new List<int>();
+        public List<int> PlayerBScoreOverTime = new List<int>();
+
         private DateTime gameStart;
         private DateTime endPlayerTurn;
         private DateTime endServerTurn;
+        public string Status { get; set; }
 
         private object synclock = new object();
-
-        private bool _started;
-        private bool serverComplete;
-
+        
         public Game(int? seed, int? id) : base()
         {
             if (seed != null && seed.HasValue)
@@ -86,7 +87,6 @@ namespace PlanetWars.Server
 
             Turn = 0;
             Running = false;
-            _started = false;
             _gameLoop = new HighFrequencyTimer(60, this.Update);
             GenerateMap();
 
@@ -216,6 +216,11 @@ namespace PlanetWars.Server
         {
             var id = _authTokenToId(authToken);
             return _getFleetsForPlayer(id);
+        }
+
+        private Player _getPlayerForId(int id)
+        {
+            return Players.Values.FirstOrDefault(p => p.Id == id);
         }
 
         private List<Fleet> _getFleetsForPlayer(int id)
@@ -399,8 +404,14 @@ namespace PlanetWars.Server
                 if(_planets.All(p => p.OwnerId == 1) || _planets.All(p => p.OwnerId == 2))
                 {
                     // player has won
+                    var playerId = _planets.FirstOrDefault().OwnerId;
+                    var player = Players.Values.FirstOrDefault(p => p.Id == playerId);
+                    this.Status = $"Player {player.PlayerName} wins";
                     this.GameOver = true;
                 }
+
+                PlayerAScoreOverTime.Add(_getPlayerScore(1));
+                PlayerBScoreOverTime.Add(_getPlayerScore(2));
 
                 // Turn complete
                 Turn++;
@@ -413,7 +424,18 @@ namespace PlanetWars.Server
 
             if (Turn >= MAX_TURN)
             {
+                // todo max turn, most ships wins
+                if(_getPlayerScore(1)> _getPlayerScore(2))
+                {
+                    this.Status = $"Player {_getPlayerForId(1).PlayerName} wins";
+                }
+                else
+                {
+                    this.Status = $"Player {_getPlayerForId(2).PlayerName} wins";
+                }
+
                 this.GameOver = true;
+
             }
 
         }
@@ -422,6 +444,7 @@ namespace PlanetWars.Server
         {
             var status = new StatusResult()
             {
+                Status = this.Status,
                 IsGameOver = this.GameOver,
                 CurrentTurn = Turn,
                 NextTurnStart = endServerTurn,
@@ -432,8 +455,10 @@ namespace PlanetWars.Server
                 Fleets = _fleets.ToList().Select(f => Mapper.Map<Shared.Fleet>(f)).ToList(),
                 PlayerA = 1,
                 PlayerAScore = _getPlayerScore(1),
+                PlayerAScoreOverTime = PlayerAScoreOverTime,
                 PlayerB = 2,
-                PlayerBScore = _getPlayerScore(2)
+                PlayerBScore = _getPlayerScore(2),
+                PlayerBScoreOverTime = PlayerBScoreOverTime
             };
             return status;
         }

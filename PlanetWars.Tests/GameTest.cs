@@ -105,8 +105,7 @@ namespace PlanetWars.Tests
             Assert.IsTrue(p1logon.Success, "p1 should be able to logon");
             Assert.IsNotNull(p1logon.AuthToken, "auth token should not be null");
             Assert.IsNotNull(p1logon.GameStart, "game start should not be null");
-            Assert.AreEqual(p1logon.Id, 1, "First player should get #1 as ID");
-            Assert.AreEqual(p1logon.GameId, 0, "Game ID should be 0");
+            Assert.AreEqual(1, p1logon.Id, "First player should get #1 as ID");
         }
 
         [TestMethod]
