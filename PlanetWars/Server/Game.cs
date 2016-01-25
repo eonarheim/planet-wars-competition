@@ -247,19 +247,19 @@ namespace PlanetWars.Server
             return result;
         }
 
-        public void StartDemoAgent(LogonResult demoResult, string playerName)
+        public void StartDemoAgent(string playerName)
         {
             var agentTask = Task.Factory.StartNew(() =>
             {
                 string endpoint = "";
                 if (IsRunningLocally)
                 {
-                    endpoint = "http://localhost:3193";
+                    endpoint = "http://localhost:52802";
                 }
                 else {
                     endpoint = "http://planetwars.azurewebsites.net";
                 }
-                AgentBase sweetDemoAgent = new AgentBase(playerName, endpoint);
+                var sweetDemoAgent = new Agent(playerName, endpoint);
                 sweetDemoAgent.Start().Wait();
             });
         }
@@ -282,7 +282,6 @@ namespace PlanetWars.Server
             var currentTime = DateTime.UtcNow;
             if (this.Waiting)
             {
-
                 if (currentTime > gameStart)
                 {
                     this.Waiting = false;
@@ -359,8 +358,12 @@ namespace PlanetWars.Server
                     _fleets.RemoveAll(f => f.NumberOfTurnsToDestination <= 0);
                 }
 
-                // Update scores
-                // todo check for game over conditions
+                // Check game over conditions
+                if(_planets.All(p => p.OwnerId == 1) || _planets.All(p => p.OwnerId == 2))
+                {
+                    // player has won
+                    this.GameOver = true;
+                }
 
                 // Turn complete
                 Turn++;
@@ -368,8 +371,6 @@ namespace PlanetWars.Server
                 endServerTurn = endPlayerTurn.AddMilliseconds(SERVER_TURN_LENGTH);
                 Processing = false;
                 System.Diagnostics.Debug.WriteLine($"Game {Id} : Turn {Turn} : Next Turn Start {endServerTurn.Subtract(DateTime.UtcNow).TotalMilliseconds}ms");
-
-                // TODO UPDATE VIZ
             }
 
 

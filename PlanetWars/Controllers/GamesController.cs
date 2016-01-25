@@ -50,6 +50,7 @@ namespace PlanetWars.Controllers
             if (results.IsValid)
             {
                 return _gameManager.Execute(logon);
+                
             }
             else
             {
