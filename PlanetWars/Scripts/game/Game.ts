@@ -15,8 +15,7 @@ class GameSession {
 
       var game = new ex.Engine({
          canvasElementId: "game",
-         height: 480,
-         width: 720         
+         displayMode: ex.DisplayMode.Container
       });
       game.backgroundColor = ex.Color.Black;
 
@@ -44,8 +43,10 @@ class GameSession {
 
    }
 
-   static mapPlanetSize(s: number) {
-      return ((Config.PlanetMaxSize - Config.PlanetMinSize) / Config.PlanetMaxSize) * s;
+   static mapPlanetSize(growthRate: number) {
+      var sf = growthRate / _.max(_.map(GameSession.State.planets, p => p.growthRate));
+
+      return ex.Util.clamp(sf * Config.PlanetMaxSize, Config.PlanetMinSize, Config.PlanetMaxSize);
    }
 
    static mapServerCoordsToWorld(p: Server.Point): ex.Point {
@@ -70,7 +71,14 @@ class GameSession {
       // drawable space starts after padding
       x += Config.MapPadding;
       y += Config.MapPadding;
-      
+
+      // center map
+      var vw = GameSession.Game.getWidth();
+      var vh = GameSession.Game.getHeight();
+
+      x = ((vw / 2) - Config.MapSize) + x;
+      y = ((vh / 2) - Config.MapSize) + y;
+
       return new ex.Point(x, y);
    }
 
@@ -78,6 +86,13 @@ class GameSession {
 
       return $.post("/api/status", { gameId: GameSession.Id }).then(s => {
          GameSession.State = <Server.StatusResult>s;
+
+         if (GameSession.State.currentTurn > 0) {
+            $("#game-turns span").text(GameSession.State.currentTurn);
+         }
+
+         $("[data-id='1'] span").text(GameSession.State.playerAScore);
+         $("[data-id='2'] span").text(GameSession.State.playerBScore);
 
          // add planets to game
          _.each(GameSession.State.planets, (p) => {
@@ -90,6 +105,13 @@ class GameSession {
                GameSession._planets[p.id].updateState(p);
             }
          });
+
+         if (GameSession.State.isGameOver) {
+
+            $("#game-over").show();
+
+            return;
+         }
 
          // add fleets
          _.each(GameSession.State.fleets, (f) => {

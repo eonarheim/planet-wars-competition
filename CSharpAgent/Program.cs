@@ -17,17 +17,9 @@ namespace CSharpAgent
             var endpoint = args.Length > endpointIndex + 1 ? args[endpointIndex + 1] : "http://localhost:52802/";
             var name = args.Length > nameIndex + 1 ? args[nameIndex + 1] : "DemoAgent";
 
-            // Start Agent
-            try
-            {
-                var agent = new Agent(name, endpoint);
-                agent.Start().Wait();
-            }
-            catch(Exception e)
-            {
-                Console.WriteLine($"Ooop! Something went wrong starting your agent {e.Message}");
-            }
-
+            // Start Agent            
+            var agent = new Agent(name, endpoint);
+            agent.Start().Wait();            
         }
     }
 }

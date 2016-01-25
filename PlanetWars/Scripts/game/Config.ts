@@ -2,7 +2,7 @@
 
    // Map Size
    MapPadding: 50, // padding around edge of map, inside will be "drawable" space for planets
-   MapSize: 300,
+   MapSize: 400,
    
    //
    // fleets
@@ -23,6 +23,6 @@
    // players
    //
 
-   PlayerAColor: ex.Color.Red,
-   PlayerBColor: ex.Color.Blue
+   PlayerAColor: ex.Color.fromHex("#c53e30"),
+   PlayerBColor: ex.Color.fromHex("#3797bf")
 }

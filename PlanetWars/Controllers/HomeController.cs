@@ -25,7 +25,7 @@ namespace PlanetWars.Controllers
                 var gameModel = new GameSession()
                 {
                     GameId = id,
-                    Players = GameManager.Instance.Games[id].Players.Select(p => p.Key).ToArray()
+                    Players = GameManager.Instance.Games[id].Players.ToDictionary(kv => kv.Value.Id, kv => kv.Value.PlayerName)
                 };
                 return View(gameModel);
             }

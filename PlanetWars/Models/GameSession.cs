@@ -9,6 +9,6 @@ namespace PlanetWars.Models
     {
         public int GameId { get; set; }
 
-        public string[] Players { get; set; }
+        public IDictionary<int, string> Players { get; set; }
     }
 }

@@ -1,12 +1,25 @@
 ﻿@model PlanetWars.Models.GameSession
 @{
     ViewBag.Title = "Game Session #" + Model.GameId;
+    ViewBag.FullWidth = true;
 }
 
-<h2>Session #@Model.GameId</h2>
-<h3>Players: @string.Join(", ", Model.Players)</h3>
-
-<canvas id="game"></canvas>
+<div class="game-container">
+    <div class="game-info">
+        <h2 id="game-id">Session #@Model.GameId</h2>
+        <h3 id="game-turns">Turn: <span>(Waiting for players...)</span></h3>
+        <ul id="game-players" class="list-unstyled">
+            @foreach (var p in Model.Players)
+            {
+                <li data-id="@p.Key">@p.Value: <span></span></li>
+            }
+        </ul>
+        <h2 id="game-over">Game over</h2>
+    </div>
+    <div class="game-canvas">
+        <canvas id="game"></canvas>
+    </div>
+</div>
 
 @section scripts {
     <script type="text/javascript">
