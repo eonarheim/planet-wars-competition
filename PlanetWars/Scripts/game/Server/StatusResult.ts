@@ -5,7 +5,7 @@ module Server {
     export interface StatusResult {
         
         isGameOver: boolean;
-        status: boolean;
+        status: string;
         playerA: number;
         playerB: number;
         playerAScore: number;
@@ -17,5 +17,7 @@ module Server {
         serverTurnLength: number;
         planets: Planet[];
         fleets: Fleet[];
+        playerAScoreOverTime: number[];
+        playerBScoreOverTime: number[];
     }
 }
