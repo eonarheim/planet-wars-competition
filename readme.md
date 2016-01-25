@@ -79,7 +79,7 @@ Request
 ```json
 {
   "AuthToken": "mytoken",
-  "GameId": 45
+  "GameId": 45,
   "DestinationPlanetId": 1,
   "SourcePlanetId": 1,
   "NumberOfShips": 30
@@ -122,8 +122,8 @@ Response
   "CurrentTurn": 30,
   "EndOfCurrentTurn": "somedatetime",
   "NextTurnStart": "somedatetime",
-  "PlayerTurnLength": 600, // ms
-  "ServerTurnLength": 200, //ms
+  "PlayerTurnLength": 600, /* in ms */
+  "ServerTurnLength": 200, /* in ms */
   "Planets" : [],
   "Fleets" : []
 }
