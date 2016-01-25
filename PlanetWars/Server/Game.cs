@@ -28,7 +28,7 @@ namespace PlanetWars.Server
         private int _MAXPLAYERID = 1;
         private int _MAXPLANETID = 0;
         private int _MAXFLEETID = 0;
-        private int _NUM_PLANETS = 4;
+        private int _NUM_PLANETS = 3;
         public static readonly long START_DELAY = 10000; // 5 seconds
         public static readonly long PLAYER_TURN_LENGTH = 700; // 200 ms
         public static readonly long SERVER_TURN_LENGTH = 200; // 200 ms
@@ -117,18 +117,71 @@ namespace PlanetWars.Server
 
         private void GenerateMap()
         {
-            for (var i = 0; i < _NUM_PLANETS; i++)
+            
+            _planets.Add(new Planet()
             {
-                _planets.Add(new Planet()
-                {
-                    Id = _MAXPLANETID++,
-                    OwnerId = -1,
-                    Position = new Point(i * 4, i * 4),
-                    NumberOfShips = 40
-                });
-            }
+                Id = _MAXPLANETID++,
+                OwnerId = -1,
+                Position = new Point(0, 0),
+                NumberOfShips = 40,
+                GrowthRate = 5
+            });
+
+            _planets.Add(new Planet()
+            {
+                Id = _MAXPLANETID++,
+                OwnerId = -1,
+                Position = new Point(2, 2),
+                NumberOfShips = 10,
+                GrowthRate = 2
+            });
+
+            _planets.Add(new Planet()
+            {
+                Id = _MAXPLANETID++,
+                OwnerId = -1,
+                Position = new Point(8, 0),
+                NumberOfShips = 20,
+                GrowthRate = 3
+            });
+           
+            _planets.Add(new Planet()
+            {
+                Id = _MAXPLANETID++,
+                OwnerId = -1,
+                Position = new Point(0, 8),
+                NumberOfShips = 20,
+                GrowthRate = 3
+            });
+            _planets.Add(new Planet()
+            {
+                Id = _MAXPLANETID++,
+                OwnerId = -1,
+                Position = new Point(4, 4),
+                NumberOfShips = 100,
+                GrowthRate = 7
+            });
+
+            _planets.Add(new Planet()
+            {
+                Id = _MAXPLANETID++,
+                OwnerId = -1,
+                Position = new Point(6, 6),
+                NumberOfShips = 10,
+                GrowthRate = 2
+            });
+
+            _planets.Add(new Planet()
+            {
+                Id = _MAXPLANETID++,
+                OwnerId = -1,
+                Position = new Point(8, 8),
+                NumberOfShips = 40,
+                GrowthRate = 5
+            });
+
             _planets[0].OwnerId = 1;
-            _planets[_NUM_PLANETS - 1].OwnerId = 2;
+            _planets[_planets.Count - 1].OwnerId = 2;
         }
         
         public MoveResult MoveFleet(MoveRequest request)
@@ -401,10 +454,10 @@ namespace PlanetWars.Server
                 }
 
                 // Check game over conditions
-                if(_planets.All(p => p.OwnerId == 1) || _planets.All(p => p.OwnerId == 2))
+                if(!_planets.Any(p => p.OwnerId == 1) || !_planets.Any(p => p.OwnerId == 2))
                 {
                     // player has won
-                    var playerId = _planets.FirstOrDefault().OwnerId;
+                    var playerId = _planets.FirstOrDefault(p => p.OwnerId != -1).OwnerId;
                     var player = Players.Values.FirstOrDefault(p => p.Id == playerId);
                     this.Status = $"Player {player.PlayerName} wins";
                     this.GameOver = true;
