@@ -14,7 +14,7 @@ namespace PlanetWars.Server
     public interface IGame
     {
         LogonResult LogonPlayer(string playerName);
-        void Update(long delta);
+        void Update(DateTime currentTime);
         void Start();
         void Stop();
     }
@@ -29,11 +29,10 @@ namespace PlanetWars.Server
         private int _MAXPLANETID = 0;
         private int _MAXFLEETID = 0;
         private int _NUM_PLANETS = 4;
-        private static readonly long START_DELAY = 10000; // 5 seconds
-        private static readonly long PLAYER_TURN_LENGTH = 700; // 200 ms
-        private static readonly long SERVER_TURN_LENGTH = 200; // 200 ms
-        private static readonly int MAX_TURN = 200; // default 200 turns
-        private static readonly int PLANET_GROWTH_RATE = 5; // 5 ships per turn
+        public static readonly long START_DELAY = 10000; // 5 seconds
+        public static readonly long PLAYER_TURN_LENGTH = 700; // 200 ms
+        public static readonly long SERVER_TURN_LENGTH = 200; // 200 ms
+        public static readonly int MAX_TURN = 200; // default 200 turns
 
         public static bool IsRunningLocally = HttpContext.Current.Request.IsLocal;
         public bool Running { get; private set; }
@@ -91,9 +90,29 @@ namespace PlanetWars.Server
             _gameLoop = new HighFrequencyTimer(60, this.Update);
             GenerateMap();
 
-            gameStart = DateTime.UtcNow.AddMilliseconds(START_DELAY);
+            UpdateTimeInfo(DateTime.UtcNow);
+        }
+
+        public void UpdateTimeInfo(DateTime currentTime)
+        {
+            gameStart = currentTime.AddMilliseconds(START_DELAY);
             endPlayerTurn = gameStart.AddMilliseconds(PLAYER_TURN_LENGTH);
             endServerTurn = endPlayerTurn.AddMilliseconds(SERVER_TURN_LENGTH);
+        }
+
+        public void SetPlanets(List<Planet> planets)
+        {
+            this._planets = planets;
+        }
+
+        public void SetFleets(List<Fleet> fleets)
+        {
+            this._fleets = fleets;
+        }
+
+        public List<Fleet> GetFleets()
+        {
+            return this._fleets;
         }
 
         private void GenerateMap()
@@ -277,9 +296,8 @@ namespace PlanetWars.Server
         }
 
 
-        public void Update(long delta)
+        public void Update(DateTime currentTime)
         {
-            var currentTime = DateTime.UtcNow;
             if (this.Waiting)
             {
                 if (currentTime > gameStart)
@@ -296,17 +314,10 @@ namespace PlanetWars.Server
             }
 
             // check if we are in the server window
-            if (currentTime > endPlayerTurn)
+            if (currentTime >= endPlayerTurn)
             {
                 // server processing                
                 Processing = true;
-
-                // Send fleets 
-                foreach (var fleet in _fleets.ToList())
-                {
-                    // travel 1 unit distance each turn
-                    fleet.NumberOfTurnsToDestination--;
-                }
 
                 // Grow ships on planets
                 foreach (var planet in _planets)
@@ -317,38 +328,64 @@ namespace PlanetWars.Server
                         planet.NumberOfShips += planet.GrowthRate;
                     }
                 }
-                
 
-                // first find the fleets that are done traveling
-                foreach (var fleet in _fleets.ToList().Where(f => f.NumberOfTurnsToDestination <= 0))
+                // Send fleets 
+                foreach (var fleet in _fleets.ToList())
                 {
-                    // Fleet arrives at a friendly planet
-                    if (fleet.Destination.OwnerId == fleet.OwnerId)
+                    // travel 1 unit distance each turn
+                    fleet.NumberOfTurnsToDestination--;
+                }               
+               
+                // Resolve planet battles
+                foreach(var planet in _planets.ToList())
+                {
+                    var combatants = new Dictionary<int, int>();
+                    combatants.Add(planet.OwnerId, planet.NumberOfShips);
+                    // find fleets destined for this planet
+                    var fleets = _fleets.ToList().Where(f => f.Destination.Id == planet.Id && f.NumberOfTurnsToDestination <= 0).ToList();
+                    foreach(var fleet in fleets)
                     {
-                        fleet.Destination.NumberOfShips += fleet.NumberOfShips;
+                        if (combatants.ContainsKey(fleet.OwnerId))
+                        {
+                            combatants[fleet.OwnerId] += fleet.NumberOfShips;
+                        }
+                        else
+                        {
+                            combatants.Add(fleet.OwnerId, fleet.NumberOfShips);
+                        }
                     }
 
-                    // Fleet arrives at a hostile planet
-                    if (fleet.Destination.OwnerId != fleet.OwnerId)
+                    if(fleets.Count <= 0)
                     {
-                        // Not enough ships to colonize
-                        if (fleet.Destination.NumberOfShips > fleet.NumberOfShips)
-                        {
-                            fleet.Destination.NumberOfShips -= fleet.NumberOfShips;
-                        }
+                        continue;
+                    }
 
-                        // Enough ships to colonize
-                        if (fleet.Destination.NumberOfShips < fleet.NumberOfShips)
+                    KeyValuePair<int, int> second = new KeyValuePair<int, int>(1, 0);
+                    KeyValuePair<int, int> winner = new KeyValuePair<int, int>(2, 0);
+                    foreach(var keyval in combatants)
+                    {
+                        if(keyval.Value > second.Value)
                         {
-                            fleet.Destination.NumberOfShips = fleet.NumberOfShips - fleet.Destination.NumberOfShips;
-                            fleet.Destination.OwnerId = fleet.OwnerId;
+                            if(keyval.Value > winner.Value)
+                            {
+                                second = winner;
+                                winner = keyval;
+                            }
+                            else
+                            {
+                                second = keyval;
+                            }                            
                         }
+                    }
 
-                        // If the net force is equal original owner retains the planet
-                        if (fleet.Destination.NumberOfShips == fleet.NumberOfShips)
-                        {
-                            fleet.Destination.NumberOfShips = 0;
-                        }
+                    if(winner.Value > second.Value)
+                    {
+                        planet.NumberOfShips = winner.Value - second.Value;
+                        planet.OwnerId = winner.Key;
+                    }
+                    else
+                    {
+                        planet.NumberOfShips = 0;
                     }
                 }
 

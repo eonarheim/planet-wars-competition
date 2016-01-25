@@ -15,7 +15,7 @@ namespace PlanetWars.Server
     {
         private double _fps;
         private long _frameId;
-        private Action<long> _callback;
+        private Action<DateTime> _callback;
         private Action _started;
         private Action _stopped;
         private Action<int> _actualFpsUpdate;
@@ -31,7 +31,7 @@ namespace PlanetWars.Server
         /// </summary>
         /// <param name="fps">The desired frame rate per second.</param>
         /// <param name="callback">The callback to be invoked on each frame.</param>
-        public HighFrequencyTimer(double fps, Action<long> callback)
+        public HighFrequencyTimer(double fps, Action<DateTime> callback)
             : this(fps, callback, null, null, null)
         {
 
@@ -45,7 +45,7 @@ namespace PlanetWars.Server
         /// <param name="started">The callback to be invoked when the timer enters the running state.</param>
         /// <param name="stopped">The callback to be invoked when the timer enters the stopped state.</param>
         /// <param name="actualFpsUpdate">The callback to invoked to receive updates of the actual frame rate.</param>
-        public HighFrequencyTimer(double fps, Action<long> callback, Action started, Action stopped, Action<int> actualFpsUpdate)
+        public HighFrequencyTimer(double fps, Action<DateTime> callback, Action started, Action stopped, Action<int> actualFpsUpdate)
         {
             if (fps <= 0)
             {
@@ -136,7 +136,8 @@ namespace PlanetWars.Server
                     // Time to call the callback!
                     actualFps++;
                     Interlocked.Increment(ref _frameId);
-                    _callback(sw.ElapsedMilliseconds - lastMs);
+                    //_callback(sw.ElapsedMilliseconds - lastMs);
+                    _callback(DateTime.UtcNow);
                     lastMs = sw.ElapsedMilliseconds;
                 }
                 else
