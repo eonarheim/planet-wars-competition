@@ -178,25 +178,43 @@ namespace PlanetWars.Tests
             Assert.AreEqual(1, planets[1].NumberOfShips, "Planet should have 1 ship on it after colonization");
             Assert.AreEqual(p1Logon.Id, planets[1].OwnerId, "Planet should be owned by player 1");
         }
-
-        [TestMethod]
-        public void TestOrderDoesntMatterColonizingPlanet()
-        {
-
-        }
+        
 
         [TestMethod]
         public void TestFleetArrivesWhenItShould()
         {
+            // P1 moves fleets
+            var p1MoveResult = game.MoveFleet(new Shared.MoveRequest()
+            {
+                AuthToken = p1Logon.AuthToken,
+                GameId = p1Logon.GameId,
+                NumberOfShips = 40,
+                DestinationPlanetId = 2,
+                SourcePlanetId = 0
+            });
+
+            // Move result should be valid
+            Assert.IsTrue(p1MoveResult.Success, "Valid move result should succeed");
+            Assert.AreEqual(2, p1MoveResult.Fleet.NumberOfTurnsToDestination, "Planet is 2 moves away");
+            Assert.AreEqual(0, planets[0].NumberOfShips, "Move should have removed the ships, planet has a growth rate of 0");
+
+            // Tick engine forward to processing
+            var currentTime = startTime;
+            currentTime = currentTime.AddMilliseconds(Game.START_DELAY + Game.PLAYER_TURN_LENGTH);
+            game.Update(currentTime);
+
+            Assert.AreEqual(1, game.GetFleets().Count, "Fleet in flight");
+
+            // Tick engine forward to processing
+            currentTime = currentTime.AddMilliseconds(Game.START_DELAY + Game.PLAYER_TURN_LENGTH);
+            game.Update(currentTime);
+
+            Assert.AreEqual(0, game.GetFleets().Count, "Fleets should have arrived");
+            Assert.AreEqual(0, planets[2].NumberOfShips, "Planet should should have no ship");
+            Assert.AreEqual(p2Logon.Id, planets[2].OwnerId, "Planet should be owned by player 2 still");
 
         }
-
-        [TestMethod]
-        public void TestOriginalPlayerOwnsPlanetAfterEqualCombat()
-        {
-
-        }
-
+        
         [TestMethod]
         public void CheckPlayerWinsWhenAllOtherPlanetsTaken()
         {
