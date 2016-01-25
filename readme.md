@@ -50,6 +50,85 @@ Once you a planet is colonized it will begin producing ships every turn based on
 
 The planet wars api is a restul JSON api, as long as the agent can speak http can participate. Perl, PHP, nodejs, Ruby, Python, C#, C/C++, Erlang, etc. are welcome.
 
+#### Restful Server API
+
+An agent can be built using the following api methods, any program that can speak http will work.
+
+POST api/logon - This endpoint logs the agent into the server and provides the authentication token, game id, and start time of the game.
+
+Request
+```json
+{
+  "AgentName": "MyCoolAgent"
+}
+```
+
+Response
+```json
+{
+  "AuthToken": "sometoken",
+  "Id": 1,
+  "GameId": 45,
+  "GameStart": "someDateTime"
+}
+```
+
+POST api/move - This endpoint allows agents to move fleets to colonize other planets
+
+Request
+```json
+{
+  "AuthToken": "mytoken",
+  "GameId": 45
+  "DestinationPlanetId": 1,
+  "SourcePlanetId": 1,
+  "NumberOfShips": 30
+}
+```
+
+Response
+```json
+{
+  "Fleet": {
+   "Id": 22,
+   "OwnerId": 1,
+   "NumberOfShips": 30,
+   "DestinationPlanetId": 1,
+   "SourcePlanetId": 1
+  }
+}
+```
+
+POST api/status - This returns the current status of the game, planets, fleets, etc. This powers the visualization.
+
+Request
+```json
+{
+  "GameId": 45
+}
+```
+
+Response
+```json
+{
+  "IsGameOver": false,
+  "Status": "if over winner string",
+  "PlayerA": 1,
+  "PlayerB": 2,
+  "PlayerAScore": 1,
+  "PlayerBScore": 2,
+  "PlayerAScoreOverTime": [],
+  "PlayerBScoreOverTime": [],
+  "CurrentTurn": 30,
+  "EndOfCurrentTurn": "somedatetime",
+  "NextTurnStart": "somedatetime",
+  "PlayerTurnLength": 600, // ms
+  "ServerTurnLength": 200, //ms
+  "Planets" : [],
+  "Fleets" : []
+}
+```
+
 ### Submitting an Agent
 
 Please include a zip file with your agent, source code, and a readme on how to compile/run your agent.
