@@ -34,6 +34,7 @@ class GameSession {
    private static _turnTimer: ex.Timer;
 
    static init() {
+      GameSession.Game.add(new Starfield());
 
       GameSession.updateSessionState().then(() => {
 

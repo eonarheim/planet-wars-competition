@@ -2,6 +2,15 @@ var Assets = {};
 var Config = {
     MapPadding: 50,
     MapSize: 400,
+    StarfieldSize: 1000,
+    StarfieldMinFade: 0.2,
+    StarfieldMaxFade: 0.7,
+    StarfieldMinFadeRefreshAmount: 0.05,
+    StarfieldMaxFadeRefreshAmount: 0.15,
+    StarfieldRefreshRate: 300,
+    StarfieldMeteorFreqMin: 2000,
+    StarfieldMeteorFreqMax: 7000,
+    StarfieldMeteorSpeed: 320,
     FleetWidth: 6,
     FleetHeight: 7,
     PlanetMinSize: 15,
@@ -118,6 +127,7 @@ var GameSession = (function () {
         GameSession.Game = game;
     };
     GameSession.init = function () {
+        GameSession.Game.add(new Starfield());
         GameSession.updateSessionState().then(function () {
             GameSession._turnTimer = new ex.Timer(function () { return GameSession.updateSessionState(); }, GameSession.getTurnDuration(), true);
             GameSession.Game.add(GameSession._turnTimer);
@@ -199,4 +209,49 @@ var GameSession = (function () {
     GameSession._fleets = [];
     return GameSession;
 })();
+var Starfield = (function (_super) {
+    __extends(Starfield, _super);
+    function Starfield() {
+        _super.call(this, 0, 0, 0, 0);
+        this._stars = [];
+    }
+    Starfield.prototype.onInitialize = function () {
+        var _this = this;
+        this.setWidth(GameSession.Game.getWidth());
+        this.setHeight(GameSession.Game.getHeight());
+        for (var i = 0; i < Config.StarfieldSize; i++) {
+            this._stars.push({
+                x: ex.Util.randomIntInRange(0, this.getWidth()),
+                y: ex.Util.randomIntInRange(0, this.getHeight()),
+                o: ex.Util.randomInRange(Config.StarfieldMinFade, Config.StarfieldMaxFade)
+            });
+        }
+        this._fadeTimer = new ex.Timer(function () { return _this._updateFaded(); }, Config.StarfieldRefreshRate, true);
+        this._meteorTimer = new ex.Timer(function () { return _this._shootMeteor(); }, ex.Util.randomIntInRange(Config.StarfieldMeteorFreqMin, Config.StarfieldMeteorFreqMax), true);
+        GameSession.Game.add(this._fadeTimer);
+        GameSession.Game.add(this._meteorTimer);
+        this._updateFaded();
+    };
+    Starfield.prototype._updateFaded = function () {
+        var totalFaded = Math.floor(this._stars.length *
+            ex.Util.randomInRange(Config.StarfieldMinFadeRefreshAmount, Config.StarfieldMaxFadeRefreshAmount));
+        for (var i = 0; i < totalFaded; i++) {
+            this._stars[ex.Util.randomIntInRange(0, this._stars.length - 1)].o = ex.Util.randomInRange(Config.StarfieldMinFade, Config.StarfieldMaxFade);
+        }
+    };
+    Starfield.prototype._shootMeteor = function () {
+        var dest = new ex.Vector(ex.Util.randomInRange(0, this.getWidth()), ex.Util.randomIntInRange(50, this.getHeight() / 2));
+        var meteor = new ex.Actor(ex.Util.randomIntInRange(0, this.getWidth()), 0, 2, 2, ex.Color.fromRGB(164, 237, 255, 1));
+        meteor.moveBy(dest.x, dest.y, Config.StarfieldMeteorSpeed).asPromise().then(function () { return meteor.kill(); });
+        GameSession.Game.add(meteor);
+        this._meteorTimer.interval = ex.Util.randomIntInRange(Config.StarfieldMeteorFreqMin, Config.StarfieldMeteorFreqMax);
+    };
+    Starfield.prototype.draw = function (ctx, delta) {
+        for (var i = 0; i < this._stars.length; i++) {
+            ctx.fillStyle = ex.Color.fromRGB(255, 255, 255, this._stars[i].o);
+            ctx.fillRect(this._stars[i].x, this._stars[i].y, 1, 1);
+        }
+    };
+    return Starfield;
+})(ex.Actor);
 //# sourceMappingURL=game.js.map

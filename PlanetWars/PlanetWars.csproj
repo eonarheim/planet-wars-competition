@@ -305,6 +305,7 @@
       <CustomToolNamespace>..\PlanetWars.Shared\StatusResult.cs</CustomToolNamespace>
     </TypeScriptCompile>
     <TypeScriptCompile Include="Scripts\game\Fleet.ts" />
+    <TypeScriptCompile Include="Scripts\game\Starfield.ts" />
     <TypeScriptCompile Include="Scripts\typings\jquery\jquery.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\lodash\lodash.d.ts" />
   </ItemGroup>
