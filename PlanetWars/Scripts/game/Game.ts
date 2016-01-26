@@ -35,12 +35,14 @@ class GameSession {
    private static _turnTimer: ex.Timer;
 
    static init() {
+      
       GameSession.Game.add(new Starfield());
-
+      
       GameSession.updateSessionState().then(() => {
 
          GameSession._turnTimer = new ex.Timer(() => GameSession.updateSessionState(), GameSession.getTurnDuration(), true);
          GameSession.Game.add(GameSession._turnTimer);
+         GameSession.Game.add(new Chart(GameSession.Game.getWidth() / 2, Config.ChartOffsetY, Config.ChartWidth, Config.ChartHeight, Config.ChartBackground))
       });
 
    }
@@ -107,6 +109,7 @@ class GameSession {
          if (GameSession.State.isGameOver) {
 
             $("#game-over").show();
+            $("#game-over span").text(GameSession.State.status);
 
             return;
          }

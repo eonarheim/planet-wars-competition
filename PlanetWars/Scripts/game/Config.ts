@@ -20,7 +20,13 @@
    //
    FleetWidth: 6,
    FleetHeight: 7,  
-   FleetAnimSpeed: 400, 
+   FleetAnimSpeed: 400,
+   
+   // chart
+   ChartWidth: 500,
+   ChartHeight: 120,
+   ChartOffsetY: 100,
+   ChartBackground: ex.Color.fromRGB(255, 255, 255, 0.2), 
 
    //
    // planets

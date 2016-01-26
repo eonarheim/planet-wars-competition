@@ -257,6 +257,7 @@
   <ItemGroup>
     <TypeScriptCompile Include="Scripts\excalibur-0.6.0.d.ts" />
     <TypeScriptCompile Include="Scripts\game\Assets.ts" />
+    <TypeScriptCompile Include="Scripts\game\Chart.ts" />
     <TypeScriptCompile Include="Scripts\game\Config.ts" />
     <TypeScriptCompile Include="Scripts\game\Planet.ts" />
     <TypeScriptCompile Include="Scripts\game\Server\BaseResult.ts">

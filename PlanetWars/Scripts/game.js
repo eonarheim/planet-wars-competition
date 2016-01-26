@@ -1,6 +1,41 @@
 var Assets = {
     TextureFleets: new ex.Texture("/Content/Images/spaceship.png")
 };
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var Chart = (function (_super) {
+    __extends(Chart, _super);
+    function Chart() {
+        _super.apply(this, arguments);
+    }
+    Chart.prototype.update = function (engine, delta) {
+        _super.prototype.update.call(this, engine, delta);
+    };
+    Chart.prototype.draw = function (ctx, delta) {
+        _super.prototype.draw.call(this, ctx, delta);
+        this._drawLine(ctx, GameSession.State.playerAScoreOverTime, Config.PlayerAColor);
+        this._drawLine(ctx, GameSession.State.playerBScoreOverTime, Config.PlayerBColor);
+    };
+    Chart.prototype._drawLine = function (ctx, scores, color) {
+        var brush = new ex.Point(0, this.getHeight());
+        var step = 0, stepWidth = this.getWidth() / Math.max(35, GameSession.State.currentTurn);
+        var yMax = _.sum(_.map(GameSession.State.fleets, function (x) { return x.numberOfShips; })) +
+            _.sum(_.map(GameSession.State.planets, function (x) { return x.numberOfShips; }));
+        ctx.beginPath();
+        ctx.strokeStyle = color.toString();
+        ctx.lineWidth = 2;
+        for (step; step < scores.length; step++) {
+            brush.x = step * stepWidth;
+            brush.y = this.getHeight() - ((scores[step] / yMax) * this.getHeight());
+            ctx.lineTo(this.getBounds().left + brush.x, this.getBounds().top + brush.y);
+        }
+        ctx.stroke();
+    };
+    return Chart;
+})(ex.Actor);
 var Config = {
     MapPadding: 50,
     MapSize: 400,
@@ -16,16 +51,15 @@ var Config = {
     FleetWidth: 6,
     FleetHeight: 7,
     FleetAnimSpeed: 400,
+    ChartWidth: 500,
+    ChartHeight: 120,
+    ChartOffsetY: 100,
+    ChartBackground: ex.Color.fromRGB(255, 255, 255, 0.2),
     PlanetMinSize: 25,
     PlanetMaxSize: 120,
     PlanetNeutralColor: ex.Color.Gray,
     PlayerAColor: ex.Color.fromHex("#c53e30"),
     PlayerBColor: ex.Color.fromHex("#3797bf")
-};
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var Fleet = (function (_super) {
     __extends(Fleet, _super);
@@ -145,6 +179,7 @@ var GameSession = (function () {
         GameSession.updateSessionState().then(function () {
             GameSession._turnTimer = new ex.Timer(function () { return GameSession.updateSessionState(); }, GameSession.getTurnDuration(), true);
             GameSession.Game.add(GameSession._turnTimer);
+            GameSession.Game.add(new Chart(GameSession.Game.getWidth() / 2, Config.ChartOffsetY, Config.ChartWidth, Config.ChartHeight, Config.ChartBackground));
         });
     };
     GameSession.mapPlanetSize = function (growthRate) {
@@ -188,6 +223,7 @@ var GameSession = (function () {
             });
             if (GameSession.State.isGameOver) {
                 $("#game-over").show();
+                $("#game-over span").text(GameSession.State.status);
                 return;
             }
             _.each(GameSession.State.fleets, function (f) {
