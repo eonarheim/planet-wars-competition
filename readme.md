@@ -140,20 +140,32 @@ For example:
 >runmyagent.exe -endpoint http://my-planet-wars-game.com:1337
 ```
 
-### Getting started locally Running the Server
+### Getting Started Locally Running the Server
  
-First clone the repository locally using git (github for windows is good)
+First clone the repository locally using git ([GitHub for Windows](http://windows.github.com) is good)
 
 ```bash
 git clone https://github.com/eonarheim/planet-wars-competition.git`
 ```
 
-Open the solution in VS 2015 (community is free https://www.visualstudio.com/en-us/products/vs-2015-product-editions.aspx)
+1. Open the solution in VS 2015 ([Community Edition](https://www.visualstudio.com/en-us/products/vs-2015-product-editions.aspx) is free)
+2. Ensure you have [.NET Framework 4.6](https://www.microsoft.com/en-us/download/details.aspx?id=48130) installed
+3. Ensure you have the latest [TypeScript installed](http://typescriptlang.org) (1.7+).
 
-You may run the server locally by starting the "PlanetWars" web project in visual studio. Once you have a local server, you can point your agent at the local endpoint.
+You may run the server locally by starting the "PlanetWars" web project in Visual Studio. Once you have a local server, you can point your agent at the local endpoint.
 
 There is a prebuilt agent you can build off of :)
 
+## FAQ
 
+1. What happens on a planet you already own when there are both friendly and enemy units incoming? Do the planet's units and the incoming friendly units get combined when resolving the conflict? Or is all combat on a 1-1 basis?
 
+   - Ships cancel each other out. i.e. two players both have 5 ships arriving same turn, 0 ships land. Units you control on a planet are taken into account when enemy units try to land but if you have a fleet that arrives the same turn, combat resolves between the fleets.
 
+2. If I send ships to a planet I own and assuming there are no enemy ship incoming do they get added to the ship total on that planet? 
+
+   - Yes, ships that arrive at a planet add to the total **if you control it** otherwise it will **decrement it** if it's under another player's control.
+
+3. If multiple fleets from a player (me or enemy) arrive on the same turn are the ship totals from the fleets treated as a combined total or are they treated as separate entities when resolving combat?
+
+   - It will take the sum total of all arriving fleets *per player* that turn and resolve combat.
