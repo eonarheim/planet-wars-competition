@@ -213,6 +213,22 @@ namespace PlanetWars.Tests
             Assert.AreEqual(p2Logon.Id, planets[2].OwnerId, "Planet should be owned by player 2 still");
 
         }
+
+        [TestMethod]
+        public void PlayerCannotMoveAnotherPlayersFleets()
+        {
+            // P1 moves fleets
+            var p1MoveResult = game.MoveFleet(new Shared.MoveRequest()
+            {
+                AuthToken = p1Logon.AuthToken,
+                GameId = p1Logon.GameId,
+                NumberOfShips = 40,
+                DestinationPlanetId = 0,
+                SourcePlanetId = 2
+            });
+
+            Assert.IsFalse(p1MoveResult.Success);
+        }
         
         [TestMethod]
         public void CheckPlayerWinsWhenAllOtherPlanetsTaken()

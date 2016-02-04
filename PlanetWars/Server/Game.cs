@@ -497,6 +497,7 @@ namespace PlanetWars.Server
         {
             var status = new StatusResult()
             {
+                Success = true,
                 Status = this.Status,
                 IsGameOver = this.GameOver,
                 CurrentTurn = Turn,

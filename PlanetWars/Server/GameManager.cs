@@ -79,17 +79,13 @@ namespace PlanetWars.Server
         public StatusResult Execute(StatusRequest request)
         {
             var game = Games[request.GameId];
-            var result = game.GetStatus(request);
-            result.Success = true;
-            return result;
+            return game.GetStatus(request);
         }
 
         public MoveResult Execute(MoveRequest request)
         {
             var game = Games[request.GameId];
-            var result = game.MoveFleet(request);
-            result.Success = true;
-            return result;
+            return game.MoveFleet(request);
         }
     }
 }
