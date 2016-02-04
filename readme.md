@@ -2,7 +2,7 @@
 
 # Planet Wars AI Competition
 
-![Planet Wars](https://zippy.gfycat.com/BraveBlushingImpala.gif)
+![Planet Wars](https://cloud.githubusercontent.com/assets/563819/12822156/4062f4c0-cb2c-11e5-9672-7d94c6338970.gif)
 
 ### Game Overview
 
