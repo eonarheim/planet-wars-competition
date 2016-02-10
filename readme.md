@@ -59,17 +59,17 @@ POST api/logon - This endpoint logs the agent into the server and provides the a
 Request
 ```json
 {
-  "AgentName": "MyCoolAgent"
+  "agentName": "MyCoolAgent"
 }
 ```
 
 Response
 ```json
 {
-  "AuthToken": "sometoken",
-  "Id": 1,
-  "GameId": 45,
-  "GameStart": "someDateTime"
+  "authToken": "sometoken",
+  "id": 1,
+  "gameId": 45,
+  "gameStart": "someDateTime"
 }
 ```
 
@@ -78,23 +78,23 @@ POST api/move - This endpoint allows agents to move fleets to colonize other pla
 Request
 ```json
 {
-  "AuthToken": "mytoken",
-  "GameId": 45,
-  "DestinationPlanetId": 1,
-  "SourcePlanetId": 1,
-  "NumberOfShips": 30
+  "authToken": "mytoken",
+  "gameId": 45,
+  "destinationPlanetId": 1,
+  "sourcePlanetId": 1,
+  "numberOfShips": 30
 }
 ```
 
 Response
 ```json
 {
-  "Fleet": {
-   "Id": 22,
-   "OwnerId": 1,
-   "NumberOfShips": 30,
-   "DestinationPlanetId": 1,
-   "SourcePlanetId": 1
+  "fleet": {
+   "id": 22,
+   "ownerId": 1,
+   "numberOfShips": 30,
+   "destinationPlanetId": 1,
+   "sourcePlanetId": 1
   }
 }
 ```
@@ -104,28 +104,28 @@ POST api/status - This returns the current status of the game, planets, fleets, 
 Request
 ```json
 {
-  "GameId": 45
+  "gameId": 45
 }
 ```
 
 Response
 ```json
 {
-  "IsGameOver": false,
-  "Status": "if over winner string",
-  "PlayerA": 1,
-  "PlayerB": 2,
-  "PlayerAScore": 1,
-  "PlayerBScore": 2,
-  "PlayerAScoreOverTime": [],
-  "PlayerBScoreOverTime": [],
-  "CurrentTurn": 30,
-  "EndOfCurrentTurn": "somedatetime",
-  "NextTurnStart": "somedatetime",
-  "PlayerTurnLength": 600, /* in ms */
-  "ServerTurnLength": 200, /* in ms */
-  "Planets" : [],
-  "Fleets" : []
+  "isGameOver": false,
+  "status": "if over winner string",
+  "playerA": 1,
+  "playerB": 2,
+  "playerAScore": 1,
+  "playerBScore": 2,
+  "playerAScoreOverTime": [],
+  "playerBScoreOverTime": [],
+  "currentTurn": 30,
+  "endOfCurrentTurn": "somedatetime",
+  "nextTurnStart": "somedatetime",
+  "playerTurnLength": 600, /* in ms */
+  "serverTurnLength": 200, /* in ms */
+  "planets" : [],
+  "fleets" : []
 }
 ```
 
